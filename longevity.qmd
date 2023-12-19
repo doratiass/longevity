@@ -1,11 +1,14 @@
 ---
-title: "Longevity"
+title: "Mid-life predictors of Longevity"
 project:
   type: website
   output-dir: docs
 execute: 
   echo: true
-format: html
+format: 
+  html:
+    code-fold: show
+    code-summary: "Show the code"
 bibliography: references.bib
 ---
 
@@ -78,9 +81,7 @@ ctl_grid <- control_resamples(save_pred = TRUE,
                               save_workflow = TRUE, 
                               parallel_over = 'everything')
 
-load("raw_data/ml_df.RData")
-load("raw_data/model_data.RData")
-load("raw_data/lasso_prep.RData")
+load("raw_data/models.RData")
 ```
 
 # Data exploration
@@ -120,7 +121,6 @@ This data frame contains `r ncol(ml_df)` variables:
 ```{r}
 #| label: split data
 #| echo: true
-#| code-fold: show
 set.seed(1234) #<1>
 df_split <- initial_split(ml_df, strata = outcome) #<2>
 df_train <- training(df_split) #<3>
@@ -139,7 +139,8 @@ df_train_cv <- vfold_cv(df_train, v = 10, strata = outcome) #<4>
 ## Specify the model
 
 ```{r}
-#| label: lasso-spec
+#| label: lasso-spec-prep
+#| eval: false
 lasso_rec <- recipe(outcome ~ ., data = df_train) %>%
   update_role(id_nivdaki, new_role = "ID") %>%
   step_impute_knn(all_predictors(), neighbors = 3) %>%
@@ -159,19 +160,14 @@ lasso_wf <- workflow() %>%
   add_recipe(lasso_rec) %>% 
   add_model(lasso_spec)
 
-lasso_spec
-```
-
-```{r}
-#| label: lasso-prep
-#| eval: false
-lasso_prep <- lasso_rec %>%
+lasso_prep <- lasso_rec %>%        # for later use in SHAP
   prep(strings_as_factors = FALSE,
        log_changes = TRUE,
        verbose = TRUE)
 ```
 
 ```{r}
+#| echo: false
 lasso_prep
 ```
 
@@ -222,9 +218,12 @@ final_lasso <- finalize_workflow(
 
 final_lasso_fit <- final_lasso %>%
   last_fit(df_split)
+
+collect_metrics(final_lasso_fit)
 ```
 
 ```{r}
+#| echo: false
 collect_metrics(final_lasso_fit)
 ```
 
@@ -233,7 +232,8 @@ collect_metrics(final_lasso_fit)
 ## Specify the model
 
 ```{r}
-#| label: xgb-spec 
+#| label: xgb-spec-prep
+#| eval: false
 xgb_rec <- recipe(outcome ~ ., data = df_train) %>%
   update_role(id_nivdaki, new_role = "ID") %>%
   step_date(all_date_predictors(), keep_original_cols = FALSE, features = "month") %>%
@@ -257,12 +257,6 @@ xgb_wf <- workflow() %>%
   add_recipe(xgb_rec) %>% 
   add_model(xgb_spec)
 
-xgb_spec
-```
-
-```{r}
-#| label: xgb-prep 
-#| eval: false
 xgb_prep <- xgb_rec %>%
   prep(strings_as_factors = FALSE,
        log_changes = TRUE,
@@ -272,7 +266,7 @@ xgb_bake <- bake(xgb_prep, df_train)
 ```
 
 ```{r}
-#| eval: false
+#| echo: false
 xgb_prep
 ```
 
@@ -310,7 +304,6 @@ stopCluster(cl)
 
 ```{r}
 #| label: xgb-res 
-#| eval: false
 xgb_res %>%
   autoplot()
 
@@ -334,6 +327,11 @@ final_xgb <- finalize_workflow(
 final_xgb_fit <- final_xgb %>%
   last_fit(df_split)
 
+collect_metrics(final_xgb_fit)
+```
+
+```{r}
+#| echo: false
 collect_metrics(final_xgb_fit)
 ```
 
@@ -415,6 +413,7 @@ In @fig-cal presented calibration plots for the lasso model @fig-cal-1 and XGBoo
 #| layout-ncol: 2
 #| column: page
 #| message: false
+#| echo: false
 
 cal_plot(final_lasso_fit,"lasso_train_fit", "test", FALSE)
 cal_plot(final_xgb_fit,"xgb_train_fit", "test", FALSE)
