@@ -394,7 +394,7 @@ rbind(lasso_pr, xgb_pr) %>% #
          !is.infinite(precision)) %>%
   ggplot(aes(x = recall, y = precision, color = model)) +
   geom_path() +
-  coord_equal() +
+  coord_equal(ratio = 1/0.4) +
   theme_bw() +
   theme(legend.position = "bottom",
         legend.title = element_blank())

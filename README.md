@@ -4,7 +4,7 @@ This study uses a well known database of 10058 men recruited in 1963 and were fo
 The goal is to predict longevity using mid-life predictors.
 
 **Code Repository**
-The complete code for this study is available in the `/main/code` directory. 
+The complete code for this study is available in the main brance under`/code/scripts` directory. 
 Due to privacy considerations, the dataset cannot be shared.
 
 **Results**
