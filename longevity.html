@@ -153,19 +153,19 @@ div.csl-indent {
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-annotation="1" data-code-lines="1" data-code-cell="annotated-cell-1">Set a seed, for constant results</span>
+<span data-code-cell="annotated-cell-1" data-code-annotation="1" data-code-lines="1">Set a seed, for constant results</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-annotation="2" data-code-lines="2" data-code-cell="annotated-cell-1">Make the split object for training / testing</span>
+<span data-code-cell="annotated-cell-1" data-code-annotation="2" data-code-lines="2">Make the split object for training / testing</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-annotation="3" data-code-lines="3,4" data-code-cell="annotated-cell-1">Create the train / test data</span>
+<span data-code-cell="annotated-cell-1" data-code-annotation="3" data-code-lines="3,4">Create the train / test data</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-annotation="4" data-code-lines="5" data-code-cell="annotated-cell-1">Create a cross validation train set</span>
+<span data-code-cell="annotated-cell-1" data-code-annotation="4" data-code-lines="5">Create a cross validation train set</span>
 </dd>
 </dl>
 </div>
@@ -585,7 +585,7 @@ ID:          1</code></pre>
 <span id="cb51-42"><a href="#cb51-42" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span><span class="fu">is.infinite</span>(precision)) <span class="sc">%&gt;%</span></span>
 <span id="cb51-43"><a href="#cb51-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> recall, <span class="at">y =</span> precision, <span class="at">color =</span> model)) <span class="sc">+</span></span>
 <span id="cb51-44"><a href="#cb51-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_path</span>() <span class="sc">+</span></span>
-<span id="cb51-45"><a href="#cb51-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
+<span id="cb51-45"><a href="#cb51-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>(<span class="at">ratio =</span> <span class="dv">1</span><span class="sc">/</span><span class="fl">0.4</span>) <span class="sc">+</span></span>
 <span id="cb51-46"><a href="#cb51-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb51-47"><a href="#cb51-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
 <span id="cb51-48"><a href="#cb51-48" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.title =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
