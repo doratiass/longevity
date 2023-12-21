@@ -5,22 +5,6 @@ library(Rfast)
 library(gtExtras)
 
 # Functions ####
-post_issue_dor <- function(title, body = "") {
-  gh::gh(
-    endpoint = "POST /repos/doratiass/iihd/issues",
-    title = title,
-    body = body
-  )
-}
-
-post_issue_saar <- function(title, body = "") {
-  gh::gh(
-    endpoint = "POST /repos/saar104/iihd/issues",
-    title = title,
-    body = body
-  )
-}
-
 check_two_vars <- function(var_1, var_2, df = raw_data) {
   df %>% 
     select((!!sym(var_1)), (!!sym(var_2))) %>% 
