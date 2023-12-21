@@ -112,7 +112,7 @@ This data frame contains `r ncol(ml_df)-1` variables:
 
 2.  create specifications for the different models
 
-3.  hyper-tune parameters
+3.  hypertune parameters
 
 4.  examine results
 
