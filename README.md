@@ -11,6 +11,6 @@ Due to privacy considerations, the dataset cannot be shared.
 The full output of the study can be accessed [here](https://doratiass.github.io/longevity/).
 
 **SHAP Values Investigation**
-An online tool for exploring SHAP (Shapley additive explanations) values is provided at this [link](https://dorati-longevity-calc.hf.space).
+An online tool for exploring SHAP (Shapley additive explanations) values is provided at this [link](https://dorati-longevity-shap.hf.space).
 
 Feel free to explore the results and engage with the interactive tool. If you have any questions or feedback, please don't hesitate to reach out.

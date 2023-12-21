@@ -58,3 +58,10 @@ references.bib
 /.quarto/
 /_site/
 /longevity_shap/creds/
+/longevity_shap/longevity_shap.Rproj
+/longevity_shap/README.md
+/longevity_shap/.Rdata
+/longevity_shap/.gitignore
+/longevity_shap/.gitattributes
+/longevity_shap/.Rhistory
+/longevity_shap/Dockerfile
