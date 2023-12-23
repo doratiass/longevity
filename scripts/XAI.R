@@ -11,6 +11,7 @@ library(gridExtra)
 library(doFuture)
 tidymodels_prefer()
 
+source("~/Documents/stat_projects/longevity/longevity_shap/dict.R")
 set.seed(45)
 cat("\f")
 
@@ -24,7 +25,8 @@ shap_exp_log <- fastshap::explain(extract_workflow(final_log_fit), X = df_test,
 
 shap_log <- shapviz(shap_exp_log)
 
-shap_imp_log <- sv_importance(shap_log, kind = "both", show_numbers = TRUE) +
+shap_imp_log <- sv_importance(shap_log, kind = "bar", show_numbers = TRUE) +
+  scale_y_discrete(labels = vars_label) +
   theme_classic()
 
 # LASSO ####
@@ -33,7 +35,8 @@ shap_exp_lasso <- fastshap::explain(extract_workflow(final_lasso_fit), X = df_te
 
 shap_lasso <- shapviz(shap_exp_lasso)
 
-shap_imp_lasso <- sv_importance(shap_lasso, kind = "both", show_numbers = TRUE) +
+shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE) +
+  scale_y_discrete(labels = vars_label) +
   theme_classic()
 
 # XGB ####
@@ -53,10 +56,12 @@ shap_xgb <- shapviz(extract_fit_engine(final_xgb_fit), X_pred = xgb_shap_data,
 
 shap_imp_bar_xgb <- sv_importance(shap_xgb, kind = "bar", show_numbers = TRUE,
                                   max_display = 20) +
+  scale_y_discrete(labels = vars_label) +
   theme_classic(base_size = 16)
 
 shap_imp_bee_xgb <- sv_importance(shap_xgb, kind = "beeswarm", show_numbers = FALSE,
                                   max_display = 20) +
+  scale_y_discrete(labels = vars_label) +
   theme_classic(base_size = 16)
 
 ggarrange(shap_imp_bar_xgb,
@@ -65,6 +70,12 @@ ggarrange(shap_imp_bar_xgb,
           ncol = 2)
 
 ## PDP ####
+sv_dependence(shap_xgb, v = deps, 
+              color_var = NULL, 
+              alpha = 0.5, interactions = FALSE)  &
+  labs(x = NULL) &
+  theme_classic(base_size = 12)
+
 deps <- shap_imp_bar_xgb$data %>%
   mutate(feature = as.character(feature)) %>%
   distinct(feature) %>%
