@@ -9,6 +9,8 @@ library(doParallel)
 library(probably)
 library(gridExtra)
 library(doFuture)
+library(ggpubr)
+library(ggVennDiagram)
 tidymodels_prefer()
 
 source("~/Documents/stat_projects/longevity/longevity_shap/dict.R")
@@ -25,7 +27,8 @@ shap_exp_log <- fastshap::explain(extract_workflow(final_log_fit), X = df_test,
 
 shap_log <- shapviz(shap_exp_log)
 
-shap_imp_log <- sv_importance(shap_log, kind = "bar", show_numbers = TRUE) +
+shap_imp_log <- sv_importance(shap_log, kind = "bar", show_numbers = TRUE,
+                              max_display = 20) +
   scale_y_discrete(labels = vars_label) +
   theme_classic()
 
@@ -35,7 +38,8 @@ shap_exp_lasso <- fastshap::explain(extract_workflow(final_lasso_fit), X = df_te
 
 shap_lasso <- shapviz(shap_exp_lasso)
 
-shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE) +
+shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE,
+                                max_display = 20) +
   scale_y_discrete(labels = vars_label) +
   theme_classic()
 
@@ -58,6 +62,7 @@ shap_imp_bar_xgb <- sv_importance(shap_xgb, kind = "bar", show_numbers = TRUE,
                                   max_display = 20) +
   scale_y_discrete(labels = vars_label) +
   theme_classic(base_size = 16)
+
 
 shap_imp_bee_xgb <- sv_importance(shap_xgb, kind = "beeswarm", show_numbers = FALSE,
                                   max_display = 20) +
@@ -99,9 +104,16 @@ dep_plot %>%
   facet_wrap(~feature, scales = "free") +
   theme_classic()
 
-# KNN ####
+# Venn Diagram ####
+library(RColorBrewer)
+myCol <- brewer.pal(3, "Pastel2")
+log_shap_vars <- as.character(unique(sapply(shap_imp_log$data$feature, label_get)))
+lasso_shap_vars <- as.character(unique(sapply(shap_imp_lasso$data$feature, label_get)))
+xgb_shap_vars <- as.character(unique(sapply(shap_imp_bar_xgb$data$feature, label_get)))
 
-# Nnet ####
-
-# Stack ####
-
+intersect(log_shap_vars,lasso_shap_vars)
+intersect(log_shap_vars,xgb_shap_vars)
+intersect(lasso_shap_vars,xgb_shap_vars)
+intersect(log_shap_vars,intersect(lasso_shap_vars,xgb_shap_vars))
+ggVennDiagram(
+  x = list("Log" = log_shap_vars, "LASSO" = lasso_shap_vars, "XGB" = xgb_shap_vars))

@@ -5,3 +5,10 @@ save(cal_plot,ctl_grid,df_split,df_test,
      lasso_wf,ml_df,thresh_corr,thresh_other,
      xgb_bake,xgb_best_auc,xgb_grid,xgb_prep,
      xgb_rec,xgb_res,xgb_spec,xgb_wf, file = "raw_data/models.RData")
+
+save(cal_fig_lasso, cal_fig_log, cal_fig_xgb, cal_plot,
+     dep_plot, dep_plot_list, deps, 
+     shap_exp_lasso, shap_exp_log, shap_imp_bar_xgb,
+     shap_imp_bee_xgb, shap_imp_lasso, shap_imp_log,
+     shap_imp_xgb, shap_lasso, shap_log, shap_xgb,
+     file = "raw_data/plots_shap.RData")
