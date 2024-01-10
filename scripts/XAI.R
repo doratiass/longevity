@@ -1,4 +1,4 @@
-# packages ####
+# packages --------------------------------------------------------------------
 library(tidyverse)
 library(tidymodels)
 library(fastshap)
@@ -23,7 +23,7 @@ pfun <- function(object, newdata) {  # needs to return a numeric vector
   predict(object, newdata, type = "prob")[,".pred_centenarian",drop = T]
 }
 
-# logistic reg ####
+# logistic reg ---------------------------------------------------------------
 shap_exp_log <- fastshap::explain(extract_workflow(final_log_fit), X = df_test,
                                   pred_wrapper = pfun, shap_only = FALSE)
 
@@ -34,7 +34,7 @@ shap_imp_log <- sv_importance(shap_log, kind = "bar", show_numbers = TRUE,
   scale_y_discrete(labels = vars_label) +
   theme_classic()
 
-# LASSO ####
+# LASSO -----------------------------------------------------------------------
 shap_exp_lasso <- fastshap::explain(extract_workflow(final_lasso_fit), X = df_test,
                                     pred_wrapper = pfun, shap_only = FALSE)
 
@@ -45,8 +45,8 @@ shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE,
   scale_y_discrete(labels = vars_label) +
   theme_classic()
 
-# XGB ####
-## SHAP values ####
+# XGB -------------------------------------------------------------------------
+## SHAP values ----------------------------------------------------------------
 xgb_prep <- xgb_rec %>%
   prep(strings_as_factors = FALSE,
        log_changes = TRUE,
@@ -76,7 +76,7 @@ ggarrange(shap_imp_bar_xgb,
           labels = "AUTO",
           ncol = 2)
 
-## PDP ####
+## PDP -------------------------------------------------------------------------
 sv_dependence(shap_xgb, v = deps, 
               color_var = NULL, 
               alpha = 0.5, interactions = FALSE)  &
@@ -106,7 +106,7 @@ dep_plot %>%
   facet_wrap(~feature, scales = "free") +
   theme_classic()
 
-# 3 models vars ####
+# 3 models vars ---------------------------------------------------------------
 log_shap_vars <- as.character(unique(sapply(shap_imp_log$data$feature, label_get)))
 lasso_shap_vars <- as.character(unique(sapply(shap_imp_lasso$data$feature, label_get)))
 xgb_shap_vars <- as.character(unique(sapply(shap_imp_bar_xgb$data$feature, label_get)))
