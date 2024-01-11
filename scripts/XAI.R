@@ -17,15 +17,30 @@ source("~/Documents/stat_projects/longevity/longevity_shap/dict.R")
 set.seed(45)
 cat("\f")
 
-var_num <- 10
+# defenitions $ functions -----------------------------------------------------
+var_num <- 10 # number of variables to importance plot
 
-pfun <- function(object, newdata) {  # needs to return a numeric vector
-  predict(object, newdata, type = "prob")[,".pred_centenarian",drop = T]
+# prediction function for fastshap with isotonic calibration
+pfun <- function(object, newdata) {  #, train = train_model
+  probs <- predict(object, newdata, type = "prob") %>%
+  #  cal_apply(cal_estimate_isotonic(train)) %>%
+    pull(.pred_centenarian)
+  return(probs)
 }
 
 # logistic reg ---------------------------------------------------------------
+train_model <- log_train_fit
+all_cores <- parallel::detectCores(logical = TRUE)
+cl <- makeCluster(all_cores-2)
+registerDoParallel(cl)
+
 shap_exp_log <- fastshap::explain(extract_workflow(final_log_fit), X = df_test,
-                                  pred_wrapper = pfun, shap_only = FALSE)
+                                  pred_wrapper = pfun, shap_only = FALSE,
+                                  parallel = TRUE,
+                                #  .export = c("train_model"),
+                                  .packages = c("tidyverse","tidymodels", "probably"))
+
+stopCluster(cl)
 
 shap_log <- shapviz(shap_exp_log)
 
@@ -35,8 +50,18 @@ shap_imp_log <- sv_importance(shap_log, kind = "bar", show_numbers = TRUE,
   theme_classic()
 
 # LASSO -----------------------------------------------------------------------
+train_model <- lasso_train_fit
+cl <- makeCluster(all_cores-2)
+registerDoParallel(cl)
+
 shap_exp_lasso <- fastshap::explain(extract_workflow(final_lasso_fit), X = df_test,
-                                    pred_wrapper = pfun, shap_only = FALSE)
+                                    pred_wrapper = pfun, shap_only = FALSE,
+                                    parallel = TRUE,
+                                    #  .export = c("train_model"),
+                                    .packages = c("tidyverse","tidymodels", "probably"))
+
+
+stopCluster(cl)
 
 shap_lasso <- shapviz(shap_exp_lasso)
 
@@ -63,30 +88,31 @@ shap_xgb <- shapviz(extract_fit_engine(final_xgb_fit), X_pred = xgb_shap_data,
 shap_imp_bar_xgb <- sv_importance(shap_xgb, kind = "bar", show_numbers = TRUE,
                                   max_display = var_num) +
   scale_y_discrete(labels = vars_label) +
-  theme_classic(base_size = 16)
+  theme_classic()
 
 
 shap_imp_bee_xgb <- sv_importance(shap_xgb, kind = "beeswarm", show_numbers = FALSE,
                                   max_display = var_num) +
   scale_y_discrete(labels = vars_label) +
-  theme_classic(base_size = 16)
+  theme_classic()
 
-ggarrange(shap_imp_bar_xgb,
+ggarrange(shap_imp_log, shap_imp_lasso,
+          shap_imp_bar_xgb,
           shap_imp_bee_xgb + rremove("y.text")+ rremove("y.ticks")+ rremove("y.axis"),
           labels = "AUTO",
-          ncol = 2)
+          ncol = 2, nrow = 2)
 
 ## PDP -------------------------------------------------------------------------
-sv_dependence(shap_xgb, v = deps, 
-              color_var = NULL, 
-              alpha = 0.5, interactions = FALSE)  &
-  labs(x = NULL) &
-  theme_classic(base_size = 12)
-
 deps <- shap_imp_bar_xgb$data %>%
   mutate(feature = as.character(feature)) %>%
   distinct(feature) %>%
   pull(feature)
+
+sv_dependence(shap_xgb, v = deps, 
+              color_var = NULL, 
+              alpha = 0.5, interactions = TRUE)  &
+  labs(x = NULL) &
+  theme_classic(base_size = 10)
 
 dep_plot_list <- lapply(deps, pdp::partial, 
                         object = extract_fit_engine(final_xgb_fit), 
@@ -133,7 +159,7 @@ tibble(
   arrange(var) %>%
   ggplot(aes(x = model, y = var, color = var, group = var)) +
   geom_point(size = 3) +
-  geom_line(size = 1.5) +
+  geom_line(linewidth = 1.5) +
   labs(x = "",
        y = "") +
   theme_classic(base_size = 16)+
