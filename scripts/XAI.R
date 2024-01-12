@@ -83,13 +83,13 @@ xgb_shap_data <- bake(xgb_prep,
                       composition = "matrix")
 
 shap_xgb <- shapviz(extract_fit_engine(final_xgb_fit), X_pred = xgb_shap_data,
-                    interactions = TRUE)
+                    interactions = TRUE,
+                    collapse = list(med_smoke_status = c("med_smoke_status_X11.20", "med_smoke_status_X20.", "med_smoke_status_ex.smoker", "med_smoke_status_never.smoked")))
 
 shap_imp_bar_xgb <- sv_importance(shap_xgb, kind = "bar", show_numbers = TRUE,
                                   max_display = var_num) +
   scale_y_discrete(labels = vars_label) +
   theme_classic()
-
 
 shap_imp_bee_xgb <- sv_importance(shap_xgb, kind = "beeswarm", show_numbers = FALSE,
                                   max_display = var_num) +
@@ -102,35 +102,55 @@ ggarrange(shap_imp_log, shap_imp_lasso,
           labels = "AUTO",
           ncol = 2, nrow = 2)
 
-## PDP -------------------------------------------------------------------------
-deps <- shap_imp_bar_xgb$data %>%
+## DP -------------------------------------------------------------------------
+deps <- sv_importance(shap_xgb, kind = "bar", show_numbers = TRUE,
+                                  max_display = 30)$data %>%
   mutate(feature = as.character(feature)) %>%
+  filter(feature %in% names(ml_df[,sapply(ml_df, is.numeric)]),
+         feature != "med_bmi_sd") %>%
   distinct(feature) %>%
-  pull(feature)
+  pull(feature) 
 
-sv_dependence(shap_xgb, v = deps, 
+sv_dependence(shap_xgb, v = deps[1:12], 
               color_var = NULL, 
-              alpha = 0.5, interactions = TRUE)  &
+              alpha = 0.5, interactions = TRUE) -> dps
+
+for (i in 1:length(dps)) {
+  dps[[i]]$labels$title <- vars_label(dps[[i]]$labels$title)
+}
+
+dps  &
   labs(x = NULL) &
   theme_classic(base_size = 10)
 
-dep_plot_list <- lapply(deps, pdp::partial, 
-                        object = extract_fit_engine(final_xgb_fit), 
-                        train = xgb_shap_data)
+## interactions ---------------------------------------------------------------
+int_a <- sv_dependence(shap_xgb, v = "med_sbp_mean", 
+              color_var = "dmg_admission_age", 
+              alpha = 0.5, interactions = TRUE)  &
+  theme_classic(base_size = 10) &
+  theme(legend.position = "bottom")
 
-for (i in 1:length(dep_plot_list)) {
-  dep_plot_list[[i]][,"feature"] <- colnames(dep_plot_list[[i]])[1]
-  names(dep_plot_list[[i]])[1] <- "shap"
-}
+int_b <- sv_dependence(shap_xgb, v = "lab_glucose", 
+              color_var = "med_smoke_status_X20.", 
+              alpha = 0.5, interactions = TRUE)  &
+  theme_classic(base_size = 10)  &
+  theme(legend.position = "bottom")
 
-dep_plot <- bind_rows(dep_plot_list)
+int_c <- sv_dependence(shap_xgb, v = "lab_mean_hdl", 
+              color_var = "med_mi_other_combined", 
+              alpha = 0.5, interactions = TRUE)  &
+  theme_classic(base_size = 10)  &
+  theme(legend.position = "bottom")
 
-dep_plot %>%
-  ggplot(aes(shap, yhat)) +
-  geom_path() + 
-  # geom_rug(sides = "b", color = "grey") +
-  facet_wrap(~feature, scales = "free") +
-  theme_classic()
+int_d <- sv_dependence(shap_xgb, v = "med_bmi_mean", 
+              color_var = "med_dm_other_combined", 
+              alpha = 0.5, interactions = TRUE)  &
+  theme_classic(base_size = 10)  &
+  theme(legend.position = "bottom")
+
+ggarrange(int_a, int_b, int_c, int_d,
+          labels = "AUTO",
+          ncol = 2, nrow = 2)
 
 # 3 models vars ---------------------------------------------------------------
 log_shap_vars <- as.character(unique(sapply(shap_imp_log$data$feature, label_get)))
