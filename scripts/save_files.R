@@ -12,3 +12,6 @@ save(cal_fig_lasso, cal_fig_log, cal_fig_xgb, cal_plot,
      shap_imp_bee_xgb, shap_imp_lasso, shap_imp_log,
      shap_imp_xgb, shap_lasso, shap_log, shap_xgb,
      file = "raw_data/plots_shap.RData")
+
+save(shap_xgb, file = "/Users/doratias/Documents/stat_projects/private_data/longevity/shap.RData")
+
