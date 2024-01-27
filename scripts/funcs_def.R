@@ -5,6 +5,18 @@ library(gtsummary)
 library(ggpubr)
 library(modelr)
 
+# Theme -----------------------------------------------------------------------
+plot_theme <- theme(
+  plot.title = element_text(size = 25, hjust = 0.5),
+  axis.title = element_text(size = 17),
+  axis.text = element_text(size = 15),
+  legend.text = element_text(size = 15),
+  strip.text = element_text(size = 15))
+
+color_pal <- 'Set1'
+
+line_size <- 1.2
+
 # functions -------------------------------------------------------------------
 bootstrap_pr <- function(splits) {
   x <- analysis(splits)
@@ -253,15 +265,3 @@ cal_scam_plot_three <- function(final_fit, train_fit, split = c("train", "test")
   
   return(plot)
 }
-
-# Theme -----------------------------------------------------------------------
-plot_theme <- theme(
-  plot.title = element_text(size = 25, hjust = 0.5),
-  axis.title = element_text(size = 17),
-  axis.text = element_text(size = 15),
-  legend.text = element_text(size = 15),
-  strip.text = element_text(size = 15))
-
-color_pal <- 'Dark2'
-
-line_size <- 1.2

@@ -172,7 +172,7 @@ ggarrange(shap_imp_log_high, shap_imp_lasso_high,
 ggsave(filename = file.path("graphs","fig2.pdf"), plot = ggplot2::last_plot(), 
        width = 50, height = 35, dpi = 300, units = "cm", bg = "white")
 
-## Figure 3 - DP ---------------------------------------------------------------
+# Figure 3 - DP ---------------------------------------------------------------
 deps <- sv_importance(shap_xgb, kind = "bar", show_numbers = TRUE,
                       max_display = 30)$data %>%
   mutate(feature = as.character(feature)) %>%
@@ -198,7 +198,7 @@ dps  &
 ggsave(filename = file.path("graphs","fig3.pdf"), plot = ggplot2::last_plot(), 
        width = 50, height = 35, dpi = 300, units = "cm", bg = "white")
 
-## Figure 4 - interactions -----------------------------------------------------
+# Figure 4 - interactions -----------------------------------------------------
 leg_size_4 <- 14
 
 int_a <- sv_dependence(shap_xgb, v = "med_sbp_mean", 

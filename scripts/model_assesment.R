@@ -4,6 +4,7 @@ library(tidymodels)
 library(gtsummary)
 library(ggpubr)
 library(modelr)
+library(scam)
 source("~/Documents/stat_projects/longevity/scripts/funcs_def.R")
 set.seed(45)
 cat("\f")
@@ -140,7 +141,7 @@ pr_plot <- rbind(log_pr, lasso_pr, xgb_pr) %>%
         legend.title = element_blank())
 
 ### Calibration ---------------------------------------------------------------
-cal_train <- cal_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
+cal_train <- cal_scam_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
                             list(log_train_fit,lasso_train_fit,xgb_train_fit), 
                             split = "train",
                             plat = TRUE) +
@@ -149,7 +150,7 @@ cal_train <- cal_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
 
 cal_train
 
-cal_test <- cal_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
+cal_test <- cal_scam_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
                            list(log_train_fit,lasso_train_fit,xgb_train_fit), 
                            split = "test",
                            plat = TRUE) +
