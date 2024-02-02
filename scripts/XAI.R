@@ -45,7 +45,11 @@ stopCluster(cl)
 
 shap_log <- shapviz(shap_exp_log)
 
+log_features = c("#fca50a","#fca50a","#fca50a","#FCFFA4FF","#F7D03CFF",
+                 "#fca50a","#fca50a","#1B0C42FF","#fca50a","#fca50a")
+
 shap_imp_log <- sv_importance(shap_log, kind = "bar", show_numbers = TRUE,
+                              fill = log_features,
                               max_display = var_num) +
   scale_y_discrete(labels = vars_label)
 
@@ -65,7 +69,11 @@ stopCluster(cl)
 
 shap_lasso <- shapviz(shap_exp_lasso)
 
+lasso_features = c("#FCFFA4FF","#F7D03CFF","#781C6DFF","#ED6925FF","#1B0C42FF",
+                   "#CF4446FF","#4B0C6BFF","#A52C60FF","#fca50a","#fca50a")
+
 shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE,
+                                fill = lasso_features,
                                 max_display = var_num) +
   scale_y_discrete(labels = vars_label)
 
@@ -85,7 +93,11 @@ shap_xgb <- shapviz(extract_fit_engine(final_xgb_fit), X_pred = xgb_shap_data,
 #  X = df_test,
 # collapse = list(med_smoke_status = c("med_smoke_status_X11.20", "med_smoke_status_X20.", "med_smoke_status_ex.smoker", "med_smoke_status_never.smoked")))
 
+xgb_features = c("#FCFFA4FF","#F7D03CFF","#ED6925FF","#CF4446FF","#fca50a",
+                 "#F7D03CFF","#A52C60FF","#781C6DFF","#4B0C6BFF","#fca50a")
+
 shap_imp_bar_xgb <- sv_importance(shap_xgb, kind = "bar", show_numbers = TRUE,
+                                  fill = xgb_features,
                                   max_display = var_num) +
   scale_y_discrete(labels = vars_label)
 
@@ -185,15 +197,21 @@ sv_dependence(shap_xgb, v = deps[1:12],
               color_var = NULL, 
               alpha = 0.5, interactions = FALSE) -> dps
 
+sv_dependence(shap_xgb, v = deps[1:12], 
+              color_var = NULL, 
+              alpha = 0.5, interactions = TRUE) -> dps_int
+
 for (i in 1:length(dps)) {
   dps[[i]]$labels$title <- vars_label(dps[[i]]$labels$title)
+  dps[[i]] <- dps[[i]] &
+    labs(x = NULL) &
+    scale_color_brewer(palette=color_pal) &
+    geom_line(data = dps_int[[i]]$data,color = "black", linewidth = 1) &
+    plot_theme &
+    theme_classic(base_size = 16)
 }
 
-dps  &
-  labs(x = NULL) &
-  scale_color_brewer(palette=color_pal) &
-  plot_theme &
-  theme_classic(base_size = 16)
+dps
 
 ggsave(filename = file.path("graphs","fig3.pdf"), plot = ggplot2::last_plot(), 
        width = 50, height = 35, dpi = 300, units = "cm", bg = "white")
