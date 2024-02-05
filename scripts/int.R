@@ -71,15 +71,16 @@ clean_df <- raw_data %>%
                   "Technicians", "Teachers")),
     dmg_salary = factor(case_when(
       Salari == 1 ~ "Basic Salary 345+",
-      Salari == 2 ~ "Basic Salary 201-344",
-      Salari == 3 ~ "Basic Salary 135-200",
+      Salari == 2 ~ "Basic Salary 135-344",#"Basic Salary 201-344",
+      Salari == 3 ~ "Basic Salary 135-344",#Basic Salary 135-200",
       Salari == 4 ~ "Basic Salary 100-134",
       Salari == 5 ~ "Apprentice 90",
       Salari == 6 ~ "Special",
       #Salari == 7 ~ "Unknown",
-      Salari == 8 ~ "Teachers"), 
-      levels = c("Basic Salary 345+", "Basic Salary 201-344", "Basic Salary 135-200", 
-                 "Basic Salary 100-134", "Apprentice 90", "Special", "Teachers")),
+      Salari == 8 ~ "Special"#"Teachers"
+      ), 
+      levels = c("Basic Salary 345+", "Basic Salary 135-344", 
+                 "Basic Salary 100-134", "Apprentice 90", "Special")),
     dmg_education = factor(case_when(
       educ == 1 ~ "No formal school",
       educ == 2 ~ "Partial Elementary",
@@ -1028,7 +1029,7 @@ clean_df <- raw_data %>%
       station == 1 ~ "Jerusalem",
       station == 2 ~ "Tel Aviv",
       station == 3 ~ "Haifa"
-    )),
+    ), levels = c("Tel Aviv","Jerusalem","Haifa")),
     comp_ihd_incidence = case_when(
       ihd_wide == 0 ~ FALSE,
       ihd_wide == 1 ~ TRUE
