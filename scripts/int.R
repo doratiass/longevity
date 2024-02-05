@@ -335,8 +335,8 @@ clean_df <- raw_data %>%
       q55 == 4 ~ "Never",
       q55 == 5 ~ "Dont like me",
       #      q55 == -4 ~ "Refused to Answer",
-    ), ordered = TRUE, levels = c("Dont like me","Never","Not as much as Id like", 
-                                  "Sometimes","Very often")),
+    ), ordered = TRUE, levels = c("Very often", "Sometimes", 
+                                  "Not as much as Id like","Never","Dont like me")), 
     work_supervisor_appreciate = factor(case_when(
       q56 == 1 ~ "Very often",
       q56 == 2 ~ "Sometimes",
@@ -344,8 +344,8 @@ clean_df <- raw_data %>%
       q56 == 4 ~ "Never",
       q56 == 5 ~ "Dont like me",
       #      q56 == -4 ~ "Refused to Answer",
-    ), ordered = TRUE, levels = c("Dont like me","Never","Not as much as Id like", 
-                                  "Sometimes","Very often")),
+    ), ordered = TRUE, levels = c("Very often", "Sometimes", 
+                                  "Not as much as Id like","Never","Dont like me")),
     work_past_coworker_probs = factor(case_when(
       q57 == 1 ~ "Very Serious",
       q57 == 2 ~ "Serious",
@@ -396,16 +396,14 @@ clean_df <- raw_data %>%
       q63 == 3 ~ "Seldom",
       q63 == 4 ~ "Never",
       #     q63 == -4 ~ "Refused to Answer",
-    ), ordered = TRUE, levels = c("Very Often", "Sometimes", 
-                                  "Seldom","Never")),
+    ), ordered = TRUE, levels = c("Never","Seldom", "Sometimes","Very Often")),
     work_hurt_by_superior_shout = factor(case_when(
       q64 == 1 ~ "Very Often",
       q64 == 2 ~ "Sometimes",
       q64 == 3 ~ "Seldom",
       q64 == 4 ~ "Never",
       #     q64 == -4 ~ "Refused to Answer",
-    ), ordered = TRUE, levels = c("Very Often", "Sometimes", 
-                                  "Seldom","Never")),
+    ), ordered = TRUE, levels = c("Never","Seldom", "Sometimes","Very Often")),
     work_hurt_by_coworker_restrain_retaliate = factor(case_when(
       q65 == 1 ~ "Very Often",
       q65 == 2 ~ "Sometimes",
@@ -428,8 +426,7 @@ clean_df <- raw_data %>%
       Closed_person == 3 ~ "Somtimes talk",
       Closed_person == 4 ~ "Often talk",
       #    Closed_person == -4 ~ "Refused to Answer"
-    ), ordered = TRUE, levels = c("Yes", "Generally yes", 
-                  "Somtimes talk","Often talk")),
+    ), ordered = TRUE, levels = c("Often talk", "Somtimes talk", "Generally yes","Yes")),
     family_prob_reach_living_standart = factor(case_when( 
       Reach_living_Standards == 1 ~ "Very many",
       Reach_living_Standards == 2 ~ "Many",
