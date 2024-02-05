@@ -34,7 +34,7 @@ clean_df <- raw_data %>%
       area == 4 ~ "Balkan",
       area == 5 ~ "Middle East & North Africa",#"Middle East",
       area == 6 ~ "Middle East & North Africa"#"North Africa"
-    )),
+    ), levels = c("Israel", "Europe", "Balkan", "Middle East & North Africa")),
     dmg_birth_date = as.Date(Exact_birth, origin = "1970-01-01"),
     dmg_birth_year_1 = birthyr,
     dmg_birth_year_2 = Year_Birth, 
@@ -49,7 +49,7 @@ clean_df <- raw_data %>%
       famstat == 3 ~ "Seperated",
       famstat == 4 ~ "Widower",
       famstat == 5 ~ "Bachelor"
-    )),
+    ), levels = c("Married Once", "Remarried", "Seperated", "Widower", "Bachelor")),
     dmg_num_children = ifelse(Number_children == -1, NA, Number_children), 
     dmg_num_pp_living_together = case_when(
       Number_live_together < 0  ~ NA,
@@ -67,7 +67,8 @@ clean_df <- raw_data %>%
       Work_grade == 3 ~ "Special",
       Work_grade == 4 ~ "Technicians",
       Work_grade == 8 ~ "Teachers",
-    )),
+    ), levels = c("Administrative", "Professional", "Laborer", "Special", 
+                  "Technicians", "Teachers")),
     dmg_salary = factor(case_when(
       Salari == 1 ~ "Basic Salary 345+",
       Salari == 2 ~ "Basic Salary 201-344",
@@ -75,9 +76,10 @@ clean_df <- raw_data %>%
       Salari == 4 ~ "Basic Salary 100-134",
       Salari == 5 ~ "Apprentice 90",
       Salari == 6 ~ "Special",
-      Salari == 7 ~ "Unknown",
-      Salari == 8 ~ "Teachers"
-    )), 
+      #Salari == 7 ~ "Unknown",
+      Salari == 8 ~ "Teachers"), 
+      levels = c("Basic Salary 345+", "Basic Salary 201-344", "Basic Salary 135-200", 
+                 "Basic Salary 100-134", "Apprentice 90", "Special", "Teachers")),
     dmg_education = factor(case_when(
       educ == 1 ~ "No formal school",
       educ == 2 ~ "Partial Elementary",
@@ -88,9 +90,12 @@ clean_df <- raw_data %>%
       educ == 7 ~ "Seminar - with bagrut",
       educ == 8 ~ "Partial University",
       educ == 9 ~ "Full University",
-    ), ordered = TRUE), 
+    ), ordered = TRUE,
+    levels = c("No formal school", "Partial Elementary", "Full Elementary", 
+               "Partial High School", "Full High School", "Seminar - no bagrut", 
+               "Seminar - with bagrut", "Partial University", "Full University")),
     dmg_wife_education = factor(case_when(
-    #  wifeedc == 0 ~ "No Wife",
+      #  wifeedc == 0 ~ "No Wife",
       wifeedc == 1 ~ "No formal school",
       wifeedc == 2 ~ "Partial Elementary",
       wifeedc == 3 ~ "Full Elementary",
@@ -100,13 +105,16 @@ clean_df <- raw_data %>%
       wifeedc == 7 ~ "Seminar - with bagrut",
       wifeedc == 8 ~ "Partial University",
       wifeedc == 9 ~ "Full University",
-    ), ordered = TRUE), 
+    ), ordered = TRUE,
+    levels = c("No formal school", "Partial Elementary", "Full Elementary", 
+               "Partial High School", "Full High School", "Seminar - no bagrut", 
+               "Seminar - with bagrut", "Partial University", "Full University")), 
     dmg_wife_occupation = factor(case_when(
       q19 == 0 ~ "No Wife",
       q19 == 1 ~ "Housewife",
       q19 == 2 ~ "Additional Work At Home",
       q19 == 3 ~ "Work Outside Home",
-    ), ordered = TRUE),
+    ), levels = c("Housewife", "No Wife", "Additional Work At Home", "Work Outside Home")),
     dmg_wife_work_outside = factor(case_when(
       q20 == 0 ~ "Housewife or No Wife",
       q20 == 1 ~ "1-9",
@@ -183,13 +191,14 @@ clean_df <- raw_data %>%
       physwork == 5 ~ "Physical Work",
       physwork == 6 ~ "Does not work",
       physwork == 7 ~ "Other activity",
-    )),
+    ), levels = c("Mainly Sitting","Mainly Standing/Walking",
+                  "Physical Work","Does not work","Other activity")),
     physical_activity_after_work = factor(case_when(
       leisure == 1 ~ "Almost None",
       leisure == 2 ~ "Sporadic",
       leisure == 3 ~ "Light",
       leisure == 4 ~ "Energetic",
-    )),
+    ), ordered = TRUE),
     med_smoke_65 = factor(case_when(
       smok65 == 1 ~ "1-10",
       smok65 == 2 ~ "11-20",
@@ -214,8 +223,8 @@ clean_df <- raw_data %>%
       blood == 6 ~ "AB",#"AB unspecified",
       blood == 7 ~ "B",
       blood == 8 ~ "O",
-     # blood == 9 ~ "Unkown",
-    )),
+      # blood == 9 ~ "Unkown",
+    ), levels = c("O","A","AB","B")),
     med_sbp_68 = sbp68,
     med_dbp_68 = dbp68,
     med_vital_capacity_index = vc_index, #page 28 old doc
@@ -225,25 +234,25 @@ clean_df <- raw_data %>%
       pafinan == 2 ~ "Serious",
       pafinan == 3 ~ "Not Serious",
       pafinan == 4 ~ "None",
-    ), ordered = TRUE, levels = c("Very Serious", "Serious", "Not Serious","None")),
+    ), ordered = TRUE, levels = c("None", "Not Serious", "Serious","Very Serious")),
     work_present_finance_trouble = factor(case_when(
       prfinan == 1 ~ "Very Serious",
       prfinan == 2 ~ "Serious",
       prfinan == 3 ~ "Not Serious",
       prfinan == 4 ~ "None",
-    ), ordered = TRUE, levels = c("Very Serious", "Serious", "Not Serious","None")),
+    ), ordered = TRUE, levels = c("None", "Not Serious", "Serious","Very Serious")),
     family_past_finance_trouble = factor(case_when(
       pafam == 1 ~ "Very Serious",
       pafam == 2 ~ "Serious",
       pafam == 3 ~ "Not Serious",
       pafam == 4 ~ "None",
-    ), ordered = TRUE, levels = c("Very Serious", "Serious", "Not Serious","None")),
+    ), ordered = TRUE, levels = c("None", "Not Serious", "Serious","Very Serious")),
     family_present_finance_trouble = factor(case_when(
       prfam == 1 ~ "Very Serious",
       prfam == 2 ~ "Serious",
       prfam == 3 ~ "Not Serious",
       prfam == 4 ~ "None",
-    ), ordered = TRUE, levels = c("Very Serious", "Serious", "Not Serious","None")),
+    ), ordered = TRUE, levels = c("None", "Not Serious", "Serious","Very Serious")),
     family_conflict_with_wife = factor(case_when(
       conflict_with_wife == 1 ~ "Always show it",
       conflict_with_wife == 2 ~ "Generally show it",
@@ -281,7 +290,7 @@ clean_df <- raw_data %>%
       wife_shows_life == 3 ~ "Not as much as Id like",
       wife_shows_life == 4 ~ "Never shows it",
       wife_shows_life == 5 ~ "Doesnt love me",
-   #   wife_shows_life == 6 ~ "No wife",
+      #   wife_shows_life == 6 ~ "No wife",
     ), ordered = TRUE),
     family_wife_children_listen = factor(case_when(
       Wife_children_listen == 1 ~ "Always",
@@ -297,7 +306,8 @@ clean_df <- raw_data %>%
       Family_not_listening == 3 ~ "Not Affected",
       Family_not_listening == 4 ~ "Never Happens",
       #      Family_not_listening == -4 ~ "Refused to Answer",
-    )),
+    ), ordered = TRUE, levels = c("Very Upset", "Little Upset", 
+                                  "Not Affected","Never Happens")),
     work_past_work_probs = factor(case_when(
       past_work_probs == 1 ~ "Very Serious",
       past_work_probs == 2 ~ "Serious",
@@ -316,7 +326,8 @@ clean_df <- raw_data %>%
       q54 == 3 ~ "Not trying - no change",
       q54 == 4 ~ "Not trying - satisfied",
       #     q54 == -4 ~ "Refused to Answer",
-    )),
+    ), levels = c("Not trying - no change","Certain to succeed", 
+                  "Not certain to succeed", "Not trying - satisfied")),
     work_coworker_like = factor(case_when(
       q55 == 1 ~ "Very often",
       q55 == 2 ~ "Sometimes",
@@ -324,7 +335,8 @@ clean_df <- raw_data %>%
       q55 == 4 ~ "Never",
       q55 == 5 ~ "Dont like me",
       #      q55 == -4 ~ "Refused to Answer",
-    )),
+    ), ordered = TRUE, levels = c("Dont like me","Never","Not as much as Id like", 
+                                  "Sometimes","Very often")),
     work_supervisor_appreciate = factor(case_when(
       q56 == 1 ~ "Very often",
       q56 == 2 ~ "Sometimes",
@@ -332,35 +344,36 @@ clean_df <- raw_data %>%
       q56 == 4 ~ "Never",
       q56 == 5 ~ "Dont like me",
       #      q56 == -4 ~ "Refused to Answer",
-    )),
+    ), ordered = TRUE, levels = c("Dont like me","Never","Not as much as Id like", 
+                                  "Sometimes","Very often")),
     work_past_coworker_probs = factor(case_when(
       q57 == 1 ~ "Very Serious",
       q57 == 2 ~ "Serious",
       q57 == 3 ~ "Not Serious",
       q57 == 4 ~ "None",
       #   q57 == -4 ~ "Refused to Answer",
-    ), ordered = TRUE, levels = c("Very Serious", "Serious", "Not Serious","None")),
+    ), ordered = TRUE, levels = c("None", "Not Serious", "Serious","Very Serious")),
     work_present_coworker_probs = factor(case_when(
       q58 == 1 ~ "Very Serious",
       q58 == 2 ~ "Serious",
       q58 == 3 ~ "Not Serious",
       q58 == 4 ~ "None",
       #    q58 == -4 ~ "Refused to Answer",
-    ), ordered = TRUE, levels = c("Very Serious", "Serious", "Not Serious","None")),
+    ), ordered = TRUE, levels = c("None", "Not Serious", "Serious","Very Serious")),
     work_past_superior_probs = factor(case_when(
       q59 == 1 ~ "Very Serious",
       q59 == 2 ~ "Serious",
       q59 == 3 ~ "Not Serious",
       q59 == 4 ~ "None",
       #     q59 == -4 ~ "Refused to Answer",
-    ), ordered = TRUE, levels = c("Very Serious", "Serious", "Not Serious","None")),
+    ), ordered = TRUE, levels = c("None", "Not Serious", "Serious","Very Serious")),
     work_present_superior_probs = factor(case_when(
       q60 == 1 ~ "Very Serious",
       q60 == 2 ~ "Serious",
       q60 == 3 ~ "Not Serious",
       q60 == 4 ~ "None",
       #     q60 == -4 ~ "Refused to Answer",
-    ), ordered = TRUE, levels = c("Very Serious", "Serious", "Not Serious","None")),
+    ), ordered = TRUE, levels = c("None", "Not Serious", "Serious","Very Serious")),
     work_hurt_by_coworker_forget = factor(case_when(
       q61 == 1 ~ "Usually Forget",
       q61 == 2 ~ "Tend to Forget",
@@ -415,19 +428,20 @@ clean_df <- raw_data %>%
       Closed_person == 3 ~ "Somtimes talk",
       Closed_person == 4 ~ "Often talk",
       #    Closed_person == -4 ~ "Refused to Answer"
-    )),
+    ), ordered = TRUE, levels = c("Yes", "Generally yes", 
+                  "Somtimes talk","Often talk")),
     family_prob_reach_living_standart = factor(case_when( 
       Reach_living_Standards == 1 ~ "Very many",
       Reach_living_Standards == 2 ~ "Many",
       Reach_living_Standards == 3 ~ "Some",
       Reach_living_Standards == 4 ~ "None",
       #      Reach_living_Standards == -4 ~ "Refused to Answer"
-    )),
+    ), ordered = TRUE, levels = c("Very many", "Many", "Some","None")),
     family_fight_injustice = factor(case_when(
       DoYou_Fight_justice == 1 ~ "Yes",
-      DoYou_Fight_justice == 1 ~ "Cant do Anything",
-      DoYou_Fight_justice == 1 ~ "Not personally concerned",
-      DoYou_Fight_justice == 1 ~ "Never came across it",
+      DoYou_Fight_justice == 2 ~ "Cant do Anything",
+      DoYou_Fight_justice == 3 ~ "Not personally concerned",
+      DoYou_Fight_justice == 4 ~ "Never came across it",
       #    DoYou_Fight_justice == -4 ~ "Refused to Answer"
     )),
     diet_type = factor(case_when(
@@ -440,7 +454,8 @@ clean_df <- raw_data %>%
       on_Diet_Which_kind == 6 ~ "Fat Reduction",
       on_Diet_Which_kind == 7 ~ "7",
       on_Diet_Which_kind == 8 ~ "8" #TODO need to complete values Vol 2 p 129
-    )),
+    ), levels = c("Not On Diet", "Slimming", "CHD","HTN","DM","Ulcer",
+                  "Fat Reduction","7","8")),
     diet_after_main_meal_activity = factor(After_main_mail #TODO complete
                                            # case_when(
                                            # After_main_mail == 1 ~ "??",
@@ -568,21 +583,6 @@ clean_df <- raw_data %>%
       alldiab == 1 ~ "Any postive test out 3",
     )),
     exam_date_65 = make_date(Year_exam65, Month_exam65), 
-    physical_activity_work_65 = factor(case_when( 
-      q107 == 1 ~ "Mainly Sitting at Desk",
-      q107 == 2 ~ "Mainly Sitting at car",
-      q107 == 3 ~ "Mainly Standing",
-      q107 == 4 ~ "Mainly Walking",
-      q107 == 5 ~ "Physical Work",
-      q107 == 6 ~ "Does not work",
-      q107 == 7 ~ "Other type of activity",
-    )),
-    physical_activity_after_work = factor(case_when(
-      q108 == 1 ~ "Almost None",
-      q108 == 2 ~ "Sporadic",
-      q108 == 3 ~ "Light",
-      q108 == 4 ~ "Energetic",
-    )),
     med_weight_65 = weight65,
     med_bmi_65 = med_weight_65 / ((med_height_admission/100)^2), 
     med_shoulder_measure_cm_biacromial = case_when(
@@ -853,23 +853,24 @@ clean_df <- raw_data %>%
       q373 == 8 ~ "Not at risk"
     )),
     dmg_origin = factor(case_when(
-      Origin_2 == 1 ~ "Israel 2nd generation",
+      Origin_2 == 1 ~ "Israel",#"Israel 2nd generation",
       Origin_2 == 2 ~ "East europe",
       Origin_2 == 3 ~ "Central europe",
       Origin_2 == 4 ~ "South europe",
       Origin_2 == 5 ~ "Asia",
       Origin_2 == 6 ~ "North america",
-      Origin_2 == 7 ~ "Israel 1st gen - son to europian",
-      Origin_2 == 8 ~ "Israel 1st gen - son to asian-africans",
-      Origin_2 == 9 ~ "Israel 1st gen - son to unknown"
-    )),
-    physical_activity_65 = factor(case_when(
+      Origin_2 == 7 ~ "Israel",#"Israel 1st gen - son to europian",
+      Origin_2 == 8 ~ "Israel",#"Israel 1st gen - son to asian-africans",
+      Origin_2 == 9 ~ "Israel",#"Israel 1st gen - son to unknown"
+    ), levels = c("Israel", "East europe", "Central europe", "South europe", 
+                  "Asia", "North america")),
+    physical_activity = factor(case_when(
       q377 == 1 ~ "Lowest",
       q377 == 2 ~ "Low",
       q377 == 3 ~ "Middle",
       q377 == 4 ~ "High",
       q377 == 5 ~ "Highest"
-    )),
+    ), ordered = TRUE, levels = c("Lowest", "Low", "Middle", "High", "Highest")),
     #   unk_sociological_data = ifelse(q380 == 1, TRUE, FALSE), 
     dmg_rlgeduc = factor(case_when(
       rlgeduc == 1 ~ "Only Religious",
@@ -883,7 +884,7 @@ clean_df <- raw_data %>%
       rlgself == 3 ~ "Traditional",
       rlgself == 4 ~ "Secular",
       rlgself == 5 ~ "Agnostic"
-    )),
+    ), ordered = TRUE, levels = c("Agnostic", "Secular", "Traditional", "Less Religious","Most Religious")),
     dmg_income_inx_source_salary = ifelse(q383 != 0 & q383 != 9, TRUE, FALSE),
     dmg_income_inx_source_extra_work = ifelse(q383 == 2 | q383 == 5 | q383 == 6 | q383 == 8, TRUE, FALSE),
     dmg_income_inx_source_additional = ifelse(q383 == 3 | q383 == 5 | q383 == 7 | q383 == 8, TRUE, FALSE),
@@ -971,44 +972,46 @@ clean_df <- raw_data %>%
       q400 == 3 ~ "Last born",
       q400 == 4 ~ "One in pair of twins"
     ), 
-    levels = c("1st born","Neither 1sr nor last","Last born","One in pair of twins"),
-    ordered = TRUE),
+    levels = c("1st born","Neither 1sr nor last","Last born","One in pair of twins")),
     dmg_crisis_father_death = factor(case_when( #TODO 0  not in file
       q401 == 1 ~ "No crisis",
-      q401 == 2 ~ "age 0-6",
-      q401 == 3 ~ "age 7-12",
-      q401 == 4 ~ "0-12",
-      q401 == 5 ~ "age 13-18",
-      q401 == 8 ~ "0-18",
-      q401 == 9 ~ "19",
-      q401 == 10 ~ "0-6 + 19",
-      q401 == 11 ~ "7-12 + 19",
-      q401 == 15 ~ "7-19"
-    )),
+      q401 > 1 ~ "Crisis"
+      # q401 == 2 ~ "age 0-6",
+      # q401 == 3 ~ "age 7-12",
+      # q401 == 4 ~ "0-12",
+      # q401 == 5 ~ "age 13-18",
+      # q401 == 8 ~ "0-18",
+      # q401 == 9 ~ "19",
+      # q401 == 10 ~ "0-6 + 19",
+      # q401 == 11 ~ "7-12 + 19",
+      # q401 == 15 ~ "7-19"
+    ), levels = c("No crisis","Crisis")),
     dmg_crisis_mother_death = factor(case_when(
       q402 == 1 ~ "No crisis",
-      q402 == 2 ~ "age 0-6",
-      q402 == 3 ~ "age 7-12",
-      q402 == 4 ~ "0-12",
-      q402 == 5 ~ "age 13-18",
-      q402 == 8 ~ "0-18",
-      q402 == 9 ~ "19"
-    )),
+      q402 > 1 ~ "Crisis"
+      # q402 == 2 ~ "age 0-6",
+      # q402 == 3 ~ "age 7-12",
+      # q402 == 4 ~ "0-12",
+      # q402 == 5 ~ "age 13-18",
+      # q402 == 8 ~ "0-18",
+      # q402 == 9 ~ "19"
+    ), levels = c("No crisis","Crisis")),
     dmg_concentration_camp = factor(case_when( # TODO rest of the levels not listed
-      q403 == 0 ~ "age unknown, unknown with whom",
+   #   q403 == 0 ~ "age unknown, unknown with whom",
       q403 == 1 ~ "Never was",
-      q403 == 5 ~ "5",
-      q403 == 9 ~ "9",
-      q403 == 11 ~ "11",
-      q403 == 17 ~ "17",
-      q403 == 21 ~ "21",
-      q403 == 25 ~ "25",
-      q403 == 29 ~ "29",
-      q403 == 37 ~ "37",
-      q403 == 41 ~ "41",
-      q403 == 45 ~ "45",
-      q403 == 77 ~ "77",
-    )),
+      # q403 == 5 ~ "5",
+      # q403 == 9 ~ "9",
+      # q403 == 11 ~ "11",
+      # q403 == 17 ~ "17",
+      # q403 == 21 ~ "21",
+      # q403 == 25 ~ "25",
+      # q403 == 29 ~ "29",
+      # q403 == 37 ~ "37",
+      # q403 == 41 ~ "41",
+      # q403 == 45 ~ "45",
+      # q403 == 77 ~ "77",
+      q403 != 1 ~ "Was"
+    ), levels = c("Never was","Was")),
     work_family_interested = factor(case_when(
       q404 == 1 ~ "Yes",
       q404 == 2 ~ "Not very much",
@@ -1022,7 +1025,7 @@ clean_df <- raw_data %>%
       q405 == 3 ~ "Not so successful",
       q405 == 4 ~ "Unsuccessful",
       q405 == 5 ~ "No wife"
-    )),
+    ), levels = c("Very successful","Rather successful","Not so successful","Unsuccessful","No wife")),
     #  comp_restrain_retaliation = restrain_retaliation, #dochtomous q48
     work_station = factor(case_when( # TODO what does it mean
       station == 1 ~ "Jerusalem",
@@ -1226,12 +1229,13 @@ smoke_data <- clean_df %>%
     med_smoke_status == "less than 5 pipes" ~ "11-20",
     med_smoke_status == "5 pipes or more" ~ "20+",
     TRUE ~ as.character(med_smoke_status)
-  )),
+  ), 
+  levels = c("never smoked","ex-smoker","1-10","11-20","20+")),
   med_smoke_change = factor(case_when(
     diff > 0 ~ "Increased",
     diff < 0 ~ "Decreased",
     diff == 0 ~ "No change",
-  ))) %>%
+  ), levels = c("No change","Decreased","Increased"))) %>%
   select(id_nivdaki, med_smoke_status, med_smoke_change)
 
 
@@ -1271,7 +1275,7 @@ diabetes_data <- clean_df %>%
               med_diabetes_at_admission_63 == TRUE ~ "Present",
               med_diabetes_new == TRUE ~ "Present",
               TRUE ~ "Negative"
-            )))
+            ), levels = c("Negative","Present")))
 
 ## MI ####
 mi_vars <- c(colnames(clean_df)[str_detect(colnames(clean_df),"MI")],
@@ -1304,7 +1308,7 @@ mi_data <- clean_df %>%
       med_past_ihd == TRUE ~ "Present",
       med_new_ihd == TRUE ~ "Present",
       TRUE ~ "Negative"
-    )))
+    ), levels = c("Negative","Present")))
 
 ## angina ####
 angina_vars <- c(colnames(clean_df)[str_detect(colnames(clean_df),"angina")],
@@ -1350,7 +1354,7 @@ angina_data <- clean_df %>%
       med_angina_68 == "Definite AP" ~ "Present",
       med_angina_68 == "Suspect AP" ~ "Present",
       TRUE ~ "Negative"
-    ))
+    ), levels = c("Negative","Present"))
   )
 
 ## Cancer #### 
@@ -1392,7 +1396,7 @@ pulmonary_data <- clean_df %>%
       med_Lungs_anyside == TRUE ~ "Present",
       med_COPD == TRUE ~ "Present",
       TRUE ~ "Negative"
-    ))
+    ), levels = c("Negative","Present"))
   )
 
 ## general ####
@@ -1409,30 +1413,30 @@ gen_med <- clean_df %>%
       med_peripheral_art_dis == "Definite" ~ "Present",
       med_peripheral_art_dis == "Suspect" ~ "Present",
       med_peripheral_art_dis == "None" ~ "Negative",
-    )),
+    ), levels = c("Negative","Present")),
     med_htn = factor(case_when(
       med_past_HTN_68 == "Since exam II" ~ "Present",
       med_past_HTN_68 == "Previously" ~ "Present",
       med_past_HTN_68 == "None" ~ "Negative",
-    )),
+    ), levels = c("Negative","Present")),
     med_limbs = factor(case_when(
       med_past_limbs_68 == "Hemiplegia" ~ "Present",
       med_past_limbs_68 == "Other" ~ "Present",
       med_past_limbs_68 == "NAD" ~ "Negative",
-    )),
+    ), levels = c("Negative","Present")),
     med_intermittent_claudication = factor(case_when(
       med_past_intermittent_claudication == "IC" ~ "Present",
       med_past_intermittent_claudication == "Multiple answers" ~ "Present",
       med_past_intermittent_claudication_65 == "Positive" ~ "Present",
       med_past_intermittent_claudication_68 == "Present" ~ "Present",
-      TRUE ~ "Negative")),
+      TRUE ~ "Negative"), levels = c("Negative","Present")),
     med_peptic = factor(case_when(
       med_past_peptic_summary == "Incidence" ~ "Present",
       med_past_peptic == TRUE ~ "Present",
       med_past_peptic_68 == "Previously" ~ "Present",
       med_past_peptic_68 == "Since exam II" ~ "Present",
       TRUE ~ "Negative"
-    )),
+    ), levels = c("Negative","Present")),
     med_renal = factor(case_when(
       comp_CKD == 1 ~ "Present",
       comp_CKD == 2 ~ "Present",
@@ -1441,12 +1445,12 @@ gen_med <- clean_df %>%
       comp_RENAL_chronic == 1 ~ "Present",
       comp_RENAL_chronic == 2 ~ "Present",
       TRUE ~ "Negative"
-    )),
+    ), levels = c("Negative","Present")),
     med_medication = factor(case_when(
       med_takes_any_medication_65 == TRUE ~ "Yes",
       med_past_htn_medication_68 == TRUE ~ "Yes",
       TRUE ~ "No"
-    ))
+    ), levels = c("No","Yes"))
   )
 
 ## comp ####
