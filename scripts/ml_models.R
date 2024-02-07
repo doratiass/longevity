@@ -22,6 +22,7 @@ library(shapviz)
 tidymodels_prefer()
 
 set.seed(45)
+cat("\f")
 
 # defs ------------------------------------------------------------------------
 thresh_other <- 0.1
@@ -70,11 +71,10 @@ df_train_cv <- vfold_cv(df_train, v = 10, strata = outcome)
 
 # logistic regression ----------------------------------------------------------
 ## prepare the data -----------------------------------------------------------
-log_rec_step <- recipe(outcome ~ ., data = df_train) %>%
-  update_role(id_nivdaki, new_role = "ID") %>%
+log_rec_step <- recipe(outcome ~ ., data = df_train %>% select(-id_nivdaki)) %>%
   step_impute_knn(all_predictors(), neighbors = 3) %>%
   step_zv(all_numeric_predictors()) %>%
-  step_poly(all_numeric_predictors(), degree = 3) %>% #-c(med_diabetes_new,med_COPD)
+  step_poly(all_numeric_predictors(), degree = 3) %>% 
   step_date(all_date_predictors(), keep_original_cols = FALSE, features = "month") %>%
   step_other(all_nominal_predictors(), threshold = thresh_other, other = "other_combined") %>%
   step_corr(all_numeric_predictors(), threshold = thresh_corr)
@@ -95,7 +95,6 @@ step_model <- stepAIC(nullModel, # start with a model containing no variables
                       scope = list(upper = fullModel, # the maximum to consider is a model with all variables
                                    lower = nullModel), # the minimum to consider is a model with no variables
                       trace = 1)
-
 
 summary(step_model)
 
@@ -142,7 +141,7 @@ stopCluster(cl)
 lasso_rec <- recipe(outcome ~ ., data = df_train) %>%
   update_role(id_nivdaki, new_role = "ID") %>%
   step_impute_knn(all_predictors(), neighbors = 3) %>%
-  step_poly(all_numeric_predictors(),degree = 3) %>% #-c(med_diabetes_new,med_COPD), 
+  step_poly(all_numeric_predictors(),degree = 3) %>% 
   step_date(all_date_predictors(), keep_original_cols = FALSE, features = "month")%>%
   step_other(all_nominal_predictors(), threshold = thresh_other, other = "other_combined") %>%
   step_dummy(all_nominal_predictors()) %>%
@@ -224,9 +223,9 @@ xgb_rec <- recipe(outcome ~ ., data = df_train) %>%
 xgb_spec <- boost_tree(
   trees = tune(),
   tree_depth = tune(), min_n = tune(),
-  loss_reduction = tune(),                     ## first three: model complexity
-  sample_size = tune(), mtry = tune(),         ## randomness
-  learn_rate = tune()                          ## step size
+  loss_reduction = tune(),
+  sample_size = tune(), mtry = tune(),
+  learn_rate = tune()
 ) %>%
   set_engine("xgboost") %>%
   set_mode("classification")
@@ -296,5 +295,4 @@ save(df_split, df_train, df_test,
      step_model, log_train_fit, final_log_fit,
      final_lasso_fit, lasso_best_auc, lasso_train_fit,
      final_xgb, final_xgb_fit, xgb_train_fit,
-     xgb_shap_data, dep_plot, deps,two_pdp,
      file = "raw_data/model_data.RData")
