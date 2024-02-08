@@ -18,7 +18,7 @@ source("~/Documents/stat_projects/longevity/longevity_shap/dict.R")
 set.seed(45)
 cat("\f")
 
-# defenitions $ functions -----------------------------------------------------
+# defenitions & functions -----------------------------------------------------
 var_num <- 10 # number of variables to importance plot
 
 # prediction function for fastshap with isotonic calibration
@@ -45,14 +45,6 @@ stopCluster(cl)
 
 shap_log <- shapviz(shap_exp_log)
 
-log_features = c("#fca50a","#fca50a","#fca50a","#FCFFA4FF","#F7D03CFF",
-                 "#fca50a","#fca50a","#1B0C42FF","#fca50a","#fca50a")
-
-shap_imp_log <- sv_importance(shap_log, kind = "bar", show_numbers = TRUE,
-                              fill = log_features,
-                              max_display = var_num) +
-  scale_y_discrete(labels = vars_label)
-
 # LASSO -----------------------------------------------------------------------
 train_model <- lasso_train_fit
 cl <- makeCluster(all_cores-2)
@@ -68,14 +60,6 @@ shap_exp_lasso <- fastshap::explain(extract_workflow(final_lasso_fit), X = df_tr
 stopCluster(cl)
 
 shap_lasso <- shapviz(shap_exp_lasso)
-
-lasso_features = c("#FCFFA4FF","#F7D03CFF","#781C6DFF","#ED6925FF","#1B0C42FF",
-                   "#CF4446FF","#4B0C6BFF","#A52C60FF","#fca50a","#fca50a")
-
-shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE,
-                                fill = lasso_features,
-                                max_display = var_num) +
-  scale_y_discrete(labels = vars_label)
 
 # XGB -------------------------------------------------------------------------
 xgb_prep <- xgb_rec %>%
@@ -93,8 +77,25 @@ shap_xgb <- shapviz(extract_fit_engine(final_xgb_fit), X_pred = xgb_shap_data,
 #  X = df_test,
 # collapse = list(med_smoke_status = c("med_smoke_status_X11.20", "med_smoke_status_X20.", "med_smoke_status_ex.smoker", "med_smoke_status_never.smoked")))
 
-xgb_features = c("#FCFFA4FF","#F7D03CFF","#ED6925FF","#CF4446FF","#fca50a",
-                 "#F7D03CFF","#A52C60FF","#781C6DFF","#4B0C6BFF","#fca50a")
+# Figure 2 - variable importance -----------------------------------------------
+log_features = c("#fca50a","#fca50a","#fca50a","#4B0C6BFF","#781C6DFF",
+                 "#fca50a","#fca50a","#fca50a","#1B0C42FF","#fca50a")
+
+shap_imp_log <- sv_importance(shap_log, kind = "bar", show_numbers = TRUE,
+                              fill = log_features,
+                              max_display = var_num) +
+  scale_y_discrete(labels = vars_label)
+
+lasso_features = c("#4B0C6BFF","#781C6DFF","#1B0C42FF","#FCFFA4FF","#A52C60FF",
+                   "#CF4446FF","#ED6925FF","#F7D03CFF","#fca50a","#fca50a")
+
+shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE,
+                                fill = lasso_features,
+                                max_display = var_num) +
+  scale_y_discrete(labels = vars_label)
+
+xgb_features = c("#4B0C6BFF","#781C6DFF","#A52C60FF","#CF4446FF","#fca50a",
+                 "#781C6DFF","#ED6925FF","#F7D03CFF","#fca50a","#FCFFA4FF")
 
 shap_imp_bar_xgb <- sv_importance(shap_xgb, kind = "bar", show_numbers = TRUE,
                                   fill = xgb_features,
@@ -107,7 +108,6 @@ shap_imp_bee_xgb <- sv_importance(shap_xgb, kind = "beeswarm", show_numbers = FA
   theme_classic() +
   plot_theme
 
-# Figure 2 - variable importance -----------------------------------------------
 log_shap_vars <- as.character(unique(sapply(shap_imp_log$data$feature, label_get)))
 lasso_shap_vars <- as.character(unique(sapply(shap_imp_lasso$data$feature, label_get)))
 xgb_shap_vars <- as.character(unique(sapply(shap_imp_bar_xgb$data$feature, label_get)))
@@ -220,10 +220,10 @@ ggsave(filename = file.path("graphs","fig3.pdf"), plot = ggplot2::last_plot(),
 leg_size_4 <- 14
 
 int_a <- sv_dependence(shap_xgb, v = "med_sbp_mean", 
-                       color_var = "dmg_admission_age", 
-                       alpha = 0.5, interactions = TRUE)  &
-  theme_classic() &
-  plot_theme &
+                       color_var = "med_smoke_status_X20.", 
+                       alpha = 0.5, interactions = TRUE)  +
+  theme_classic() +
+  plot_theme +
   theme(legend.position = "bottom",
         legend.title = element_text(size = leg_size_4),
         legend.text = element_text(size = leg_size_4-2))
@@ -232,10 +232,10 @@ int_a$labels$x <- vars_label(int_a$labels$x)
 int_a$labels$colour <- vars_label(int_a$labels$colour)
 
 int_b <- sv_dependence(shap_xgb, v = "lab_glucose", 
-                       color_var = "med_smoke_status_X20.", 
-                       alpha = 0.5, interactions = TRUE)  &
-  theme_classic() &
-  plot_theme &
+                       color_var = "dmg_education", 
+                       alpha = 0.5, interactions = TRUE)  +
+  theme_classic() +
+  plot_theme +
   theme(legend.position = "bottom",
         legend.title = element_text(size = leg_size_4),
         legend.text = element_text(size = leg_size_4-2))
@@ -245,9 +245,9 @@ int_b$labels$colour <- vars_label(int_b$labels$colour)
 
 int_c <- sv_dependence(shap_xgb, v = "lab_mean_hdl", 
                        color_var = "med_mi_other_combined", 
-                       alpha = 0.5, interactions = TRUE)  &
-  theme_classic() &
-  plot_theme &
+                       alpha = 0.5, interactions = TRUE)  +
+  theme_classic() +
+  plot_theme +
   theme(legend.position = "bottom",
         legend.title = element_text(size = leg_size_4),
         legend.text = element_text(size = leg_size_4-2))
@@ -257,9 +257,9 @@ int_c$labels$colour <- vars_label(int_c$labels$colour)
 
 int_d <- sv_dependence(shap_xgb, v = "med_bmi_mean", 
                        color_var = "med_dm_other_combined", 
-                       alpha = 0.5, interactions = TRUE)  &
-  theme_classic() &
-  plot_theme &
+                       alpha = 0.5, interactions = TRUE)  +
+  theme_classic() +
+  plot_theme +
   theme(legend.position = "bottom",
         legend.title = element_text(size = leg_size_4),
         legend.text = element_text(size = leg_size_4-2))
