@@ -17,6 +17,8 @@ color_pal <- 'Set1'
 
 line_size <- 1.2
 
+leg_size_4 <- 16
+
 # functions -------------------------------------------------------------------
 bootstrap_pr <- function(splits) {
   x <- analysis(splits)
