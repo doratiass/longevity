@@ -8,8 +8,9 @@ source("~/Documents/stat_projects/longevity/scripts/funcs_def.R")
 source("~/Documents/stat_projects/longevity/longevity_shap/dict.R")
 set.seed(45)
 cat("\f")
-potential_interactions(shap_xgb, v = "med_dbp_mean")[1:50]
+
 # data ------------------------------------------------------------------------
+#potential_interactions(shap_xgb, v = "med_dbp_mean")[1:50]
 int_df <- ml_df %>% 
   drop_na(med_dbp_mean,lab_hematocrit) %>%
   transmute(med_dbp_mean,lab_hematocrit,
@@ -89,7 +90,7 @@ int_c <- int_df %>%
   geom_text(data = plot_txt_no_int, aes(x = 52, y = -5-0.25*inx, label = txt), size = 5,
             color = "black", hjust = 0) +
   scale_y_continuous(limits = c(-6,-1.8)) +
-  scale_color_brewer(palette=color_pal) +
+  scale_color_viridis_d(begin = 0.25, end = 0.85, option = "inferno") +
   theme_classic() +
   labs(y = "Probebility for Centerianism \n(log odds)",
        color = vars_label("lab_hematocrit")) +
@@ -111,7 +112,7 @@ int_d <- int_df %>%
   geom_text(data = plot_txt_int, aes(x = 52, y = -5-0.25*inx, label = txt), size = 5,
             color = "black", hjust = 0) +
   scale_y_continuous(limits = c(-6,-1.8)) +
-  scale_color_brewer(palette=color_pal) +
+  scale_color_viridis_d(begin = 0.25, end = 0.85, option = "inferno") +
   theme_classic() +
   labs(y = "",
        color = vars_label("lab_hematocrit")) +
@@ -128,7 +129,7 @@ ggarrange(
   ggarrange(int_a, int_b,
             labels = c("A", "B"),
             common.legend = TRUE,
-            legend = "top", 
+            legend = "none", 
             font.label = list(size = 20, color = "black", face = "bold"),
             ncol = 2, nrow = 1),
   ggarrange(int_c,int_d + rremove("y.axis") + 
