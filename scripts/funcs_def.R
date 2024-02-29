@@ -20,6 +20,14 @@ line_size <- 1.2
 leg_size_4 <- 16
 
 # functions -------------------------------------------------------------------
+int_labeler <- function(x) {
+  x <- str_remove_all(x, "s\\(|\\)|\\(")
+  case_when(
+    x == "med_bmi_mean" ~ "BMI",
+    str_detect(x, "med_bmi_mean") ~ paste0("BMI (",str_remove_all(x,"med_bmi_mean"),")"),
+    x == "med_sbp_mean" ~ "SBP")
+}
+
 bootstrap_pr <- function(splits) {
   x <- analysis(splits)
   pr_auc(x, outcome, .pred_centenarian)$.estimate
