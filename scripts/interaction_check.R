@@ -12,15 +12,16 @@ cat("\f")
 
 # data ------------------------------------------------------------------------
 #potential_interactions(shap_xgb, v = "med_sbp_mean")[1:50]
+#potential_interactions(shap_xgb, v = "med_bmi_mean")[1:50]
 int_df <- ml_df %>% 
   drop_na(med_sbp_mean,med_bmi_mean) %>%
   transmute(med_sbp_mean,
             med_bmi_mean = factor(case_when(
               between(med_bmi_mean, 0, 25) ~ "<25",
-              between(med_bmi_mean, 25, 27) ~ "25-27",
-              between(med_bmi_mean, 27, 30) ~ "27-30",
+              between(med_bmi_mean, 25, 27.5) ~ "25-27.5",
+              between(med_bmi_mean, 27.5, 30) ~ "27.5-30",
               between(med_bmi_mean, 30, 100) ~ ">30"
-            ), levels = c("<25", "25-27", "27-30", ">30")),
+            ), levels = c("<25", "25-27.5", "27.5-30", ">30")),
             outcome = factor(outcome,
                              levels = c("not_centenarian", "centenarian")))
 shap_xgb_dic <- shap_xgb
@@ -28,10 +29,10 @@ shap_xgb_dic <- shap_xgb
 shap_xgb_dic$X <- shap_xgb_dic$X %>%
   mutate(med_bmi_mean = factor(case_when(
     between(med_bmi_mean, 0, 25) ~ "<25",
-    between(med_bmi_mean, 25, 27) ~ "25-27",
-    between(med_bmi_mean, 27, 30) ~ "27-30",
+    between(med_bmi_mean, 25, 27.5) ~ "25-27.5",
+    between(med_bmi_mean, 27.5, 30) ~ "27.5-30",
     between(med_bmi_mean, 30, 100) ~ ">30"
-  ), levels = c("<25", "25-27", "27-30", ">30")))
+  ), levels = c("<25", "25-27.5", "27.5-30", ">30")))
 
 # models ----------------------------------------------------------------------
 gam(outcome ~ s(med_sbp_mean) + med_bmi_mean, data = int_df, family = "binomial") -> gam_no_int

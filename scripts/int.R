@@ -87,14 +87,14 @@ clean_df <- raw_data %>%
       educ == 3 ~ "Full Elementary",
       educ == 4 ~ "Partial High School",
       educ == 5 ~ "Full High School",
-      educ == 6 ~ "Seminar - no bagrut",
-      educ == 7 ~ "Seminar - with bagrut",
+      educ == 6 ~ "Seminar - no diploma",
+      educ == 7 ~ "Seminar - with diploma",
       educ == 8 ~ "Partial University",
       educ == 9 ~ "Full University",
     ), ordered = TRUE,
     levels = c("No formal school", "Partial Elementary", "Full Elementary", 
-               "Partial High School", "Full High School", "Seminar - no bagrut", 
-               "Seminar - with bagrut", "Partial University", "Full University")),
+               "Partial High School", "Full High School", "Seminar - no diploma", 
+               "Seminar - with diploma", "Partial University", "Full University")),
     dmg_wife_education = factor(case_when(
       #  wifeedc == 0 ~ "No Wife",
       wifeedc == 1 ~ "No formal school",
@@ -102,14 +102,14 @@ clean_df <- raw_data %>%
       wifeedc == 3 ~ "Full Elementary",
       wifeedc == 4 ~ "Partial High School",
       wifeedc == 5 ~ "Full High School",
-      wifeedc == 6 ~ "Seminar - no bagrut",
-      wifeedc == 7 ~ "Seminar - with bagrut",
+      wifeedc == 6 ~ "Seminar - no diploma",
+      wifeedc == 7 ~ "Seminar - with diploma",
       wifeedc == 8 ~ "Partial University",
       wifeedc == 9 ~ "Full University",
     ), ordered = TRUE,
     levels = c("No formal school", "Partial Elementary", "Full Elementary", 
-               "Partial High School", "Full High School", "Seminar - no bagrut", 
-               "Seminar - with bagrut", "Partial University", "Full University")), 
+               "Partial High School", "Full High School", "Seminar - no diploma", 
+               "Seminar - with diploma", "Partial University", "Full University")), 
     dmg_wife_occupation = factor(case_when(
       q19 == 0 ~ "No Wife",
       q19 == 1 ~ "Housewife",
@@ -1047,7 +1047,7 @@ clean_df <- raw_data %>%
     comp_wtlow_high = wtlow_high,
     comp_wthigh_low = wthigh_low,
     comp_fluctuate = fluctuate,
-    comp_pcpoly = pcpoly,
+    med_pcpoly = pcpoly,
     comp_CHD63_wide = CHD63_wide,
     comp_SBPdiff = SBPdiff,
     comp_MedianSBPdiff = MedianSBPdiff,
@@ -1065,7 +1065,7 @@ clean_df <- raw_data %>%
     )),
     comp_died_strok = died_strok,
     comp_agnostic = `_agnostic_`,
-    comp_SES_4cat = SES_4cat,
+    dmg_SES = SES_4cat,
     comp_Metasynd = Metasynd,
     comp_num_Metasynd = num_Metasynd,
     comp_trunk_periph_fat = trunk_periph_fat,
@@ -1402,7 +1402,7 @@ gen_med_vars <- c("med_past_HTN_68","med_past_limbs_68","med_past_intermittent_c
                   "med_past_intermittent_claudication_65","med_past_intermittent_claudication_68",
                   "med_past_peptic_summary", "med_past_peptic", "med_past_peptic_68","med_peripheral_art_dis",
                   "med_takes_any_medication_65","med_past_htn_medication_68","comp_CKD",
-                  "med_past_kidney_68","comp_RENAL_chronic")
+                  "med_past_kidney_68","comp_RENAL_chronic","med_pcpoly")
 
 gen_med <- clean_df %>%
   transmute(
@@ -1448,7 +1448,8 @@ gen_med <- clean_df %>%
       med_takes_any_medication_65 == TRUE ~ "Yes",
       med_past_htn_medication_68 == TRUE ~ "Yes",
       TRUE ~ "No"
-    ), levels = c("No","Yes"))
+    ), levels = c("No","Yes")),
+    med_pcpoly
   )
 
 ## comp ####
@@ -1457,8 +1458,6 @@ comp_vars <- colnames(clean_df)[str_detect(colnames(clean_df),"comp")]
 comp_data <- clean_df %>%
   transmute(
     id_nivdaki,
-    comp_pcpoly,
-    comp_SES_4cat = factor(comp_SES_4cat, ordered = TRUE),
     comp_forced_pv)
 
 #  outcome ####

@@ -29,23 +29,17 @@ pfun <- function(object, newdata) {  #, train = train_model
   return(probs)
 }
 
-# logistic reg ---------------------------------------------------------------
-train_model <- log_train_fit
-all_cores <- parallel::detectCores(logical = TRUE)
-cl <- makeCluster(all_cores-2)
-registerDoParallel(cl)
+# SHAP objects ----------------------------------------------------------------
+## logistic reg ---------------------------------------------------------------
+step_model$anova %>%
+  rename(var = Step) %>%
+  mutate(var = str_remove(str_split_i(var, "\\+ ", i=2),regex("_poly_[1-3]")),
+         var = ifelse(var == "comp_SES_4cat", "dmg_SES", as.character(var))) %>%
+  drop_na(var) %>%
+  head(var_num) %>%
+  arrange(desc(Deviance)) -> log_imp_vars
 
-shap_exp_log <- fastshap::explain(extract_workflow(final_log_fit), X = df_train,
-                                  pred_wrapper = pfun, shap_only = FALSE,
-                                  parallel = TRUE,
-                                  #  .export = c("train_model"),
-                                  .packages = c("tidyverse","tidymodels", "probably"))
-
-stopCluster(cl)
-
-shap_log <- shapviz(shap_exp_log)
-
-# LASSO -----------------------------------------------------------------------
+## LASSO ----------------------------------------------------------------------
 train_model <- lasso_train_fit
 cl <- makeCluster(all_cores-2)
 registerDoParallel(cl)
@@ -61,7 +55,7 @@ stopCluster(cl)
 
 shap_lasso <- shapviz(shap_exp_lasso)
 
-# XGB -------------------------------------------------------------------------
+## XGB ------------------------------------------------------------------------
 xgb_prep <- xgb_rec %>%
   prep(strings_as_factors = FALSE,
        log_changes = TRUE,
@@ -78,13 +72,18 @@ shap_xgb <- shapviz(extract_fit_engine(final_xgb_fit), X_pred = xgb_shap_data,
 # collapse = list(med_smoke_status = c("med_smoke_status_X11.20", "med_smoke_status_X20.", "med_smoke_status_ex.smoker", "med_smoke_status_never.smoked")))
 
 # Figure 2 - variable importance -----------------------------------------------
-log_features = c("#fca50a","#fca50a","#fca50a","#4B0C6BFF","#781C6DFF",
-                 "#fca50a","#fca50a","#fca50a","#1B0C42FF","#fca50a")
+log_features = c("#FCFFA4FF","#ED6925FF","#1B0C42FF","#CF4446FF","#fca50a",
+                 "#fca50a","#A52C60FF","#fca50a","#4B0C6BFF","#781C6DFF")
 
-shap_imp_log <- sv_importance(shap_log, kind = "bar", show_numbers = TRUE,
-                              fill = log_features,
-                              max_display = var_num) +
-  scale_y_discrete(labels = vars_label)
+shap_imp_log <- log_imp_vars %>%
+  ggplot(aes(x = reorder(var, Deviance), y = Deviance, fill = var)) +
+  geom_col() +
+  scale_x_discrete(labels = vars_label) +
+  labs(x = "",#"Variable",
+       y = "Deviance") +
+  scale_fill_manual(values = log_features) +
+  # scale_y_continuous(labels = scales::percent) +
+  coord_flip()
 
 lasso_features = c("#4B0C6BFF","#781C6DFF","#1B0C42FF","#FCFFA4FF","#A52C60FF",
                    "#CF4446FF","#ED6925FF","#F7D03CFF","#fca50a","#fca50a")
@@ -108,7 +107,7 @@ shap_imp_bee_xgb <- sv_importance(shap_xgb, kind = "beeswarm", show_numbers = FA
   theme_classic() +
   plot_theme
 
-log_shap_vars <- as.character(unique(sapply(shap_imp_log$data$feature, label_get)))
+log_shap_vars <- as.character(unique(sapply(shap_imp_log$data$var, label_get)))
 lasso_shap_vars <- as.character(unique(sapply(shap_imp_lasso$data$feature, label_get)))
 xgb_shap_vars <- as.character(unique(sapply(shap_imp_bar_xgb$data$feature, label_get)))
 xgb_shap_vars[xgb_shap_vars == "Smoking Status (more than 20 cigarretes per day)"] <- "Smoking Status"
@@ -123,20 +122,21 @@ log_lasso <- intersect(log_shap_vars,lasso_shap_vars)[!(intersect(log_shap_vars,
 log_xgb <- intersect(log_shap_vars,xgb_shap_vars)[!(intersect(log_shap_vars,xgb_shap_vars) %in% all)]
 xgb_lasso <- intersect(xgb_shap_vars,lasso_shap_vars)[!(intersect(xgb_shap_vars,lasso_shap_vars) %in% all)]
 
-linewidth_log <- rep(0, length(shap_imp_log$data$feature))
-linewidth_log[vars_label(shap_imp_log$data$feature) %in% all] <- .5
-linetype_log <- rep(0, length(shap_imp_log$data$feature))
-linetype_log[vars_label(shap_imp_log$data$feature) %in% all] <- 1
+linewidth_log <- rep(0, length(shap_imp_log$data$var))
+linewidth_log[vars_label(shap_imp_log$data$var) %in% all] <- .5
+linetype_log <- rep(0, length(shap_imp_log$data$var))
+linetype_log[vars_label(shap_imp_log$data$var) %in% all] <- 1
 
 shap_imp_log_high <- shap_imp_log +
-  scale_y_discrete(labels = ~ if_else(
+  scale_x_discrete(labels = ~ if_else(
     vars_label(.x) %in% c(all,log_lasso,log_xgb),
     paste0("<span style='color: red4'><b>", vars_label(.x), "</b></span>"),
     vars_label(.x)
   )) +
   theme_classic() +
   plot_theme +
-  theme(axis.text.y = element_markdown(box.colour = "red4", linewidth = rev(linewidth_log), 
+  theme(legend.position = "none",
+        axis.text.y = element_markdown(box.colour = "red4", linewidth = rev(linewidth_log), 
                                        linetype = rev(linetype_log), r = unit(5, "pt"),
                                        padding = unit(3, "pt")))
 
@@ -216,61 +216,3 @@ dps
 ggsave(filename = file.path("graphs","fig3.pdf"), plot = ggplot2::last_plot(), 
        width = 50, height = 35, dpi = 300, units = "cm", bg = "white")
 
-# Figure 4 - interactions -----------------------------------------------------
-leg_size_4 <- 14
-
-int_a <- sv_dependence(shap_xgb, v = "med_sbp_mean", 
-                       color_var = "med_smoke_status_X20.", 
-                       alpha = 0.5, interactions = TRUE)  +
-  theme_classic() +
-  plot_theme +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = leg_size_4),
-        legend.text = element_text(size = leg_size_4-2))
-
-int_a$labels$x <- vars_label(int_a$labels$x)
-int_a$labels$colour <- vars_label(int_a$labels$colour)
-
-int_b <- sv_dependence(shap_xgb, v = "lab_glucose", 
-                       color_var = "dmg_education", 
-                       alpha = 0.5, interactions = TRUE)  +
-  theme_classic() +
-  plot_theme +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = leg_size_4),
-        legend.text = element_text(size = leg_size_4-2))
-
-int_b$labels$x <- vars_label(int_b$labels$x)
-int_b$labels$colour <- vars_label(int_b$labels$colour)
-
-int_c <- sv_dependence(shap_xgb, v = "lab_mean_hdl", 
-                       color_var = "med_mi_other_combined", 
-                       alpha = 0.5, interactions = TRUE)  +
-  theme_classic() +
-  plot_theme +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = leg_size_4),
-        legend.text = element_text(size = leg_size_4-2))
-
-int_c$labels$x <- vars_label(int_c$labels$x)
-int_c$labels$colour <- vars_label(int_c$labels$colour)
-
-int_d <- sv_dependence(shap_xgb, v = "med_bmi_mean", 
-                       color_var = "med_dm_other_combined", 
-                       alpha = 0.5, interactions = TRUE)  +
-  theme_classic() +
-  plot_theme +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = leg_size_4),
-        legend.text = element_text(size = leg_size_4-2))
-
-int_d$labels$x <- vars_label(int_d$labels$x)
-int_d$labels$colour <- vars_label(int_d$labels$colour)
-
-ggarrange(int_a, int_b, int_c, int_d,
-          labels = "AUTO",
-          font.label = list(size = 20, color = "black", face = "bold"),
-          ncol = 2, nrow = 2)
-
-ggsave(filename = file.path("graphs","fig4.pdf"), plot = ggplot2::last_plot(), 
-       width = 45, height = 35, dpi = 300, units = "cm", bg = "white")

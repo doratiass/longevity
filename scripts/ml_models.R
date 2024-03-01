@@ -30,6 +30,10 @@ thresh_corr <- 0.9
 ctl_grid <- control_resamples(save_pred = TRUE, 
                               save_workflow = TRUE, 
                               parallel_over = 'everything')
+
+new_sep_names <- function(var, lvl, ordinal) {
+  dummy_names(var = var, lvl = lvl, ordinal = ordinal, sep = "_@_")
+}
 # build df --------------------------------------------------------------------
 ## add outcome to data --------------------------------------------------------
 load("raw_data/final_df.RData")
@@ -50,6 +54,7 @@ df_w_miss <- final_df %>%
                         "diet_data_useable", "outcome_age_lfu"))) %>%
   mutate_if(is.logical, as.factor)
 
+# how to group similar words in charachter vector and count them?
 ## remove missing > 10 % ------------------------------------------------------
 miss_10_vars <- tibble(
   name = colnames(df_w_miss),
@@ -85,7 +90,7 @@ log_prep_step <- log_rec_step %>%
        verbose = TRUE)
 
 log_bake <- bake(log_prep_step, df_train)
-
+log_bake_test <- bake(log_prep_step, df_test)
 ## stepwise AIC ---------------------------------------------------------------
 nullModel <- glm(outcome ~ 1, data = log_bake, family = binomial)
 fullModel <- glm(outcome ~ ., data = log_bake, family = binomial)
@@ -98,17 +103,25 @@ step_model <- stepAIC(nullModel, # start with a model containing no variables
 
 summary(step_model)
 
-step_model_formula <- reformulate(str_remove(str_remove(strsplit(as.character(step_model$formula)[[3]], " + ", fixed = TRUE)[[1]], 
-                                                        regex("_poly_[1-3]")), "\n    "),"outcome")
+# step_model_formula <- reformulate(unique(str_remove(str_remove(
+#   strsplit(as.character(step_model$formula)[[3]], " + ", fixed = TRUE)[[1]], 
+#   regex("_poly_[1-3]")), "\n    ")),"outcome")
+
+step_model_formula <- reformulate(unique(str_remove(str_remove(
+  strsplit(str_replace_all(str_replace_all(as.character(step_model$formula)[[3]], 
+                                           "comp_SES_4cat", "dmg_SES"),
+                           "comp_pcpoly", "med_pcpoly"), " + ", fixed = TRUE)[[1]], 
+  regex("_poly_[1-3]")), "\n    ")),"outcome")
+
 ## fit model ------------------------------------------------------------------
-log_rec <- recipe(update(step_model_formula, ~ . + id_nivdaki), data = df_train) %>%
+log_rec <- recipe(update(step_model_formula, ~ . + id_nivdaki - comp_SES_4cat + dmg_SES), data = df_train) %>%
   update_role(id_nivdaki, new_role = "ID") %>%
   step_impute_knn(all_predictors(), neighbors = 3) %>%
   step_poly(all_numeric_predictors(), degree = 3) %>%
   step_date(all_date_predictors(), keep_original_cols = FALSE, features = "month")%>%
   step_zv(all_numeric_predictors()) %>%
   step_other(all_nominal_predictors(), threshold = thresh_other, other = "other_combined") %>%
-  step_dummy(all_nominal_predictors())
+  step_dummy(all_nominal_predictors(), naming = new_sep_names)
 
 log_spec <- logistic_reg() %>%
   set_engine("glm") %>%
@@ -144,7 +157,7 @@ lasso_rec <- recipe(outcome ~ ., data = df_train) %>%
   step_poly(all_numeric_predictors(),degree = 3) %>% 
   step_date(all_date_predictors(), keep_original_cols = FALSE, features = "month")%>%
   step_other(all_nominal_predictors(), threshold = thresh_other, other = "other_combined") %>%
-  step_dummy(all_nominal_predictors()) %>%
+  step_dummy(all_nominal_predictors(), naming = new_sep_names) %>%
   step_zv(all_numeric_predictors()) %>%
   step_corr(all_numeric_predictors(), threshold = thresh_corr, method = "spearman") %>%
   step_normalize(all_numeric_predictors())
@@ -215,7 +228,7 @@ xgb_rec <- recipe(outcome ~ ., data = df_train) %>%
   step_date(all_date_predictors(), keep_original_cols = FALSE, features = "month") %>%
   step_integer(all_ordered_predictors()) %>%
   step_other(all_nominal_predictors(), threshold = thresh_other, other = "other_combined") %>%
-  step_dummy(all_nominal_predictors()) %>%
+  step_dummy(all_nominal_predictors(), naming = new_sep_names) %>%
   step_zv(all_numeric_predictors()) %>% 
   step_corr(all_numeric_predictors(), threshold = thresh_corr, method = "spearman")
 
@@ -289,7 +302,7 @@ xgb_train_fit <- fit_resamples(final_xgb,
                                control = ctl_grid)
 
 stopCluster(cl)
-  
+
 # save ####
 save(df_split, df_train, df_test,
      step_model, log_train_fit, final_log_fit,

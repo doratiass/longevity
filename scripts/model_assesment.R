@@ -53,6 +53,9 @@ sum_models %>%
             ul = quantile(val, 0.975),
             ll = quantile(val, 0.025)) -> pr_bootstrap
 
+
+
+
 ## build ROC -------------------------------------------------------------------
 log_roc <- final_log_fit %>%
   collect_predictions() %>%
