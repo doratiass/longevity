@@ -60,50 +60,50 @@ sum_models %>%
 log_roc <- final_log_fit %>%
   collect_predictions() %>%
   roc_curve(outcome, .pred_centenarian) %>%
-  mutate(model = paste0(roc_bootstrap[2,1]," - ", round(roc_bootstrap[2,2],3), " (", 
-                        round(roc_bootstrap[2,4,drop=T],3),"-",
-                        round(roc_bootstrap[2,3,drop=T],3),")"),
+  mutate(model = paste0(roc_bootstrap[2,1]," - ", sprintf(roc_bootstrap[2,2], fmt = '%#.3f'), " (", 
+                        sprintf(roc_bootstrap[2,4,drop=T], fmt = '%#.3f'),"-",
+                        sprintf(roc_bootstrap[2,3,drop=T], fmt = '%#.3f'),")"),
          inx = 1)
 
 lasso_roc <- final_lasso_fit %>%
   collect_predictions() %>%
   roc_curve(outcome, .pred_centenarian) %>%
-  mutate(model = paste0(roc_bootstrap[1,1]," - ", round(roc_bootstrap[1,2],3), " (", 
-                        round(roc_bootstrap[1,4,drop=T],3),"-",
-                        round(roc_bootstrap[1,3,drop=T],3),")"),
+  mutate(model = paste0(roc_bootstrap[1,1]," - ", sprintf(roc_bootstrap[1,2], fmt = '%#.3f'), " (", 
+                        sprintf(roc_bootstrap[1,4,drop=T], fmt = '%#.3f'),"-",
+                        sprintf(roc_bootstrap[1,3,drop=T], fmt = '%#.3f'),")"),
          inx = 2)
 
 xgb_roc <- final_xgb_fit %>%
   collect_predictions() %>%
   roc_curve(outcome, .pred_centenarian) %>%
-  mutate(model = paste0(roc_bootstrap[3,1]," - ", round(roc_bootstrap[3,2],3), " (", 
-                        round(roc_bootstrap[3,4,drop=T],3),"-",
-                        round(roc_bootstrap[3,3,drop=T],3),")"),
+  mutate(model = paste0(roc_bootstrap[3,1]," - ", sprintf(roc_bootstrap[3,2], fmt = '%#.3f'), " (", 
+                        sprintf(roc_bootstrap[3,4,drop=T], fmt = '%#.3f'),"-",
+                        sprintf(roc_bootstrap[3,3,drop=T], fmt = '%#.3f'),")"),
          inx = 3)
 
 ## build PR ####
 log_pr <- final_log_fit %>%
   collect_predictions() %>%
   pr_curve(outcome, .pred_centenarian) %>%
-  mutate(model = paste0(pr_bootstrap[2,1]," - ", round(pr_bootstrap[2,2],3), " (", 
-                        round(pr_bootstrap[2,4,drop=T],3),"-",
-                        round(pr_bootstrap[2,3,drop=T],3),")"),
+  mutate(model = paste0(pr_bootstrap[2,1]," - ", sprintf(pr_bootstrap[2,2], fmt = '%#.3f'), " (", 
+                        sprintf(pr_bootstrap[2,4,drop=T], fmt = '%#.3f'),"-",
+                        sprintf(pr_bootstrap[2,3,drop=T], fmt = '%#.3f'),")"),
          inx = 1)
 
 lasso_pr <- final_lasso_fit %>%
   collect_predictions() %>%
   pr_curve(outcome, .pred_centenarian) %>%
-  mutate(model = paste0(pr_bootstrap[1,1]," - ", round(pr_bootstrap[1,2],3), " (", 
-                        round(pr_bootstrap[1,4,drop=T],3),"-",
-                        round(pr_bootstrap[1,3,drop=T],3),")"),
+  mutate(model = paste0(pr_bootstrap[1,1]," - ", sprintf(pr_bootstrap[1,2], fmt = '%#.3f'), " (", 
+                        sprintf(pr_bootstrap[1,4,drop=T], fmt = '%#.3f'),"-",
+                        sprintf(pr_bootstrap[1,3,drop=T], fmt = '%#.3f'),")"),
          inx = 2)
 
 xgb_pr <- final_xgb_fit %>%
   collect_predictions() %>%
   pr_curve(outcome, .pred_centenarian) %>%
-  mutate(model = paste0(pr_bootstrap[3,1]," - ", round(pr_bootstrap[3,2],3), " (", 
-                        round(pr_bootstrap[3,4,drop=T],3),"-",
-                        round(pr_bootstrap[3,3,drop=T],3),")"),
+  mutate(model = paste0(pr_bootstrap[3,1]," - ", sprintf(pr_bootstrap[3,2], fmt = '%#.3f'), " (", 
+                        sprintf(pr_bootstrap[3,4,drop=T], fmt = '%#.3f'),"-",
+                        sprintf(pr_bootstrap[3,3,drop=T], fmt = '%#.3f'),")"),
          inx = 3)
 
 ## visualize models -----------------------------------------------------------

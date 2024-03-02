@@ -195,6 +195,7 @@ cal_scam_plot_three <- function(final_fit, train_fit, split = c("train", "test")
         train_fit[[3]] %>%
           collect_predictions() %>%
           mutate(model = "XGBoost")) %>%
+        rename(pred = .pred_centenarian) %>%
         mutate(model = fct_relevel(model, "LASSO", "Logistic reg", "XGBoost"))
     }
     
@@ -225,6 +226,7 @@ cal_scam_plot_three <- function(final_fit, train_fit, split = c("train", "test")
         final_fit[[3]] %>%
           collect_predictions() %>%
           mutate(model = "XGBoost")) %>%
+        rename(pred = .pred_centenarian) %>%
         mutate(model = fct_relevel(model, "LASSO", "Logistic reg", "XGBoost"))
     }
   }
@@ -248,7 +250,7 @@ cal_scam_plot_three <- function(final_fit, train_fit, split = c("train", "test")
     group_by(model) %>%
     summarise(int = coef_int(outcome,pred),
               slope = coef_slope(outcome,pred)) %>%
-    mutate(txt = paste0(model,", int: ", int,", slope ", slope),
+    mutate(txt = paste0(model,", int: ", sprintf(int, fmt = '%#.2f'),", slope ", sprintf(slope, fmt = '%#.2f')),
            inx = c(2,1,3))
   
   title <- ifelse(plat,

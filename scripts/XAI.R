@@ -41,6 +41,8 @@ step_model$anova %>%
 
 ## LASSO ----------------------------------------------------------------------
 train_model <- lasso_train_fit
+#all_cores <- parallel::detectCores(logical = TRUE)
+all_cores <- 4
 cl <- makeCluster(all_cores-2)
 registerDoParallel(cl)
 

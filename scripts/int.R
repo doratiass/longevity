@@ -242,13 +242,13 @@ clean_df <- raw_data %>%
       prfinan == 3 ~ "Not Serious",
       prfinan == 4 ~ "None",
     ), ordered = TRUE, levels = c("None", "Not Serious", "Serious","Very Serious")),
-    family_past_finance_trouble = factor(case_when(
+    family_past_trouble = factor(case_when(
       pafam == 1 ~ "Very Serious",
       pafam == 2 ~ "Serious",
       pafam == 3 ~ "Not Serious",
       pafam == 4 ~ "None",
     ), ordered = TRUE, levels = c("None", "Not Serious", "Serious","Very Serious")),
-    family_present_finance_trouble = factor(case_when(
+    family_present_trouble = factor(case_when(
       prfam == 1 ~ "Very Serious",
       prfam == 2 ~ "Serious",
       prfam == 3 ~ "Not Serious",
@@ -1047,7 +1047,7 @@ clean_df <- raw_data %>%
     comp_wtlow_high = wtlow_high,
     comp_wthigh_low = wthigh_low,
     comp_fluctuate = fluctuate,
-    med_pcpoly = pcpoly,
+    diet_pcpoly = pcpoly,
     comp_CHD63_wide = CHD63_wide,
     comp_SBPdiff = SBPdiff,
     comp_MedianSBPdiff = MedianSBPdiff,
@@ -1402,7 +1402,7 @@ gen_med_vars <- c("med_past_HTN_68","med_past_limbs_68","med_past_intermittent_c
                   "med_past_intermittent_claudication_65","med_past_intermittent_claudication_68",
                   "med_past_peptic_summary", "med_past_peptic", "med_past_peptic_68","med_peripheral_art_dis",
                   "med_takes_any_medication_65","med_past_htn_medication_68","comp_CKD",
-                  "med_past_kidney_68","comp_RENAL_chronic","med_pcpoly")
+                  "med_past_kidney_68","comp_RENAL_chronic","diet_pcpoly")
 
 gen_med <- clean_df %>%
   transmute(
@@ -1449,7 +1449,7 @@ gen_med <- clean_df %>%
       med_past_htn_medication_68 == TRUE ~ "Yes",
       TRUE ~ "No"
     ), levels = c("No","Yes")),
-    med_pcpoly
+    diet_pcpoly
   )
 
 ## comp ####

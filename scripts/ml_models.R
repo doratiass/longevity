@@ -103,15 +103,15 @@ step_model <- stepAIC(nullModel, # start with a model containing no variables
 
 summary(step_model)
 
-# step_model_formula <- reformulate(unique(str_remove(str_remove(
-#   strsplit(as.character(step_model$formula)[[3]], " + ", fixed = TRUE)[[1]], 
-#   regex("_poly_[1-3]")), "\n    ")),"outcome")
-
 step_model_formula <- reformulate(unique(str_remove(str_remove(
-  strsplit(str_replace_all(str_replace_all(as.character(step_model$formula)[[3]], 
-                                           "comp_SES_4cat", "dmg_SES"),
-                           "comp_pcpoly", "med_pcpoly"), " + ", fixed = TRUE)[[1]], 
+  strsplit(as.character(step_model$formula)[[3]], " + ", fixed = TRUE)[[1]],
   regex("_poly_[1-3]")), "\n    ")),"outcome")
+
+# step_model_formula <- reformulate(unique(str_remove(str_remove(
+#   strsplit(str_replace_all(str_replace_all(as.character(step_model$formula)[[3]], 
+#                                            "comp_SES_4cat", "dmg_SES"),
+#                            "comp_pcpoly", "med_pcpoly"), " + ", fixed = TRUE)[[1]], 
+#   regex("_poly_[1-3]")), "\n    ")),"outcome")
 
 ## fit model ------------------------------------------------------------------
 log_rec <- recipe(update(step_model_formula, ~ . + id_nivdaki - comp_SES_4cat + dmg_SES), data = df_train) %>%
@@ -261,7 +261,7 @@ xgb_grid <- grid_latin_hypercube(
 set.seed(2020)
 
 all_cores <- parallel::detectCores(logical = TRUE)
-cl <- makeCluster(all_cores-2)
+cl <- makeCluster(all_cores-4)
 registerDoParallel(cl)
 
 xgb_res <- tune_grid(
@@ -306,6 +306,6 @@ stopCluster(cl)
 # save ####
 save(df_split, df_train, df_test,
      step_model, log_train_fit, final_log_fit,
-     final_lasso_fit, lasso_best_auc, lasso_train_fit,
-     final_xgb, final_xgb_fit, xgb_train_fit,
+     final_lasso_fit, lasso_res, lasso_best_auc, lasso_train_fit,
+     final_xgb, final_xgb_fit, xgb_res, xgb_train_fit,
      file = "raw_data/model_data.RData")
