@@ -54,7 +54,6 @@ df_w_miss <- final_df %>%
                         "diet_data_useable", "outcome_age_lfu"))) %>%
   mutate_if(is.logical, as.factor)
 
-# how to group similar words in charachter vector and count them?
 ## remove missing > 10 % ------------------------------------------------------
 miss_10_vars <- tibble(
   name = colnames(df_w_miss),

@@ -14,7 +14,6 @@ library(ggtext)
 library(ggbump)
 tidymodels_prefer()
 source("~/Documents/stat_projects/longevity/scripts/funcs_def.R")
-source("~/Documents/stat_projects/longevity/longevity_shap/dict.R")
 set.seed(45)
 cat("\f")
 
@@ -74,7 +73,7 @@ shap_xgb <- shapviz(extract_fit_engine(final_xgb_fit), X_pred = xgb_shap_data,
 # collapse = list(med_smoke_status = c("med_smoke_status_X11.20", "med_smoke_status_X20.", "med_smoke_status_ex.smoker", "med_smoke_status_never.smoked")))
 
 # Figure 2 - variable importance -----------------------------------------------
-log_features = c("#FCFFA4FF","#ED6925FF","#1B0C42FF","#CF4446FF","#fca50a",
+log_features = c("#F7D03CFF","#1B0C42FF","#FCFFA4FF","#CF4446FF","#fca50a",
                  "#fca50a","#A52C60FF","#fca50a","#4B0C6BFF","#781C6DFF")
 
 shap_imp_log <- log_imp_vars %>%
@@ -88,7 +87,7 @@ shap_imp_log <- log_imp_vars %>%
   coord_flip()
 
 lasso_features = c("#4B0C6BFF","#781C6DFF","#1B0C42FF","#FCFFA4FF","#A52C60FF",
-                   "#CF4446FF","#ED6925FF","#F7D03CFF","#fca50a","#fca50a")
+                   "#CF4446FF","#F7D03CFF","#ED6925FF","#fca50a","#fca50a")
 
 shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE,
                                 fill = lasso_features,
@@ -96,7 +95,7 @@ shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE,
   scale_y_discrete(labels = vars_label)
 
 xgb_features = c("#4B0C6BFF","#781C6DFF","#A52C60FF","#CF4446FF","#fca50a",
-                 "#781C6DFF","#ED6925FF","#F7D03CFF","#fca50a","#FCFFA4FF")
+                 "#781C6DFF","#ED6925FF","#F7D03CFF","#fca50a","#fca50a")
 
 shap_imp_bar_xgb <- sv_importance(shap_xgb, kind = "bar", show_numbers = TRUE,
                                   fill = xgb_features,
@@ -109,17 +108,11 @@ shap_imp_bee_xgb <- sv_importance(shap_xgb, kind = "beeswarm", show_numbers = FA
   theme_classic() +
   plot_theme
 
-log_shap_vars <- as.character(unique(sapply(shap_imp_log$data$var, label_get)))
-lasso_shap_vars <- as.character(unique(sapply(shap_imp_lasso$data$feature, label_get)))
-xgb_shap_vars <- as.character(unique(sapply(shap_imp_bar_xgb$data$feature, label_get)))
-xgb_shap_vars[xgb_shap_vars == "Smoking Status (more than 20 cigarretes per day)"] <- "Smoking Status"
-xgb_shap_vars[xgb_shap_vars == "Smoking Status (11-20 cigarretes per day)"] <- "Smoking Status"
-xgb_shap_vars[xgb_shap_vars == "Smoking Status (never smoked)"] <- "Smoking Status"
-xgb_shap_vars <- unique(xgb_shap_vars)
+log_shap_vars <- as.character(unique(sapply(shap_imp_log$data$var, label_all)))
+lasso_shap_vars <- as.character(unique(sapply(shap_imp_lasso$data$feature, label_all)))
+xgb_shap_vars <- as.character(unique(str_split(sapply(shap_imp_bar_xgb$data$feature, label_all), " - ", simplify = TRUE)[,1]))
 
-all <- c(intersect(log_shap_vars,intersect(lasso_shap_vars,xgb_shap_vars)),
-         "Smoking Status (more than 20 cigarretes per day)",
-         "Smoking Status (11-20 cigarretes per day)")
+all <- intersect(log_shap_vars,intersect(lasso_shap_vars,xgb_shap_vars))
 log_lasso <- intersect(log_shap_vars,lasso_shap_vars)[!(intersect(log_shap_vars,lasso_shap_vars) %in% all)]
 log_xgb <- intersect(log_shap_vars,xgb_shap_vars)[!(intersect(log_shap_vars,xgb_shap_vars) %in% all)]
 xgb_lasso <- intersect(xgb_shap_vars,lasso_shap_vars)[!(intersect(xgb_shap_vars,lasso_shap_vars) %in% all)]
@@ -160,13 +153,15 @@ shap_imp_lasso_high <- shap_imp_lasso +
                                        padding = unit(3, "pt")))
 
 linewidth_xgb <- rep(0, length(shap_imp_bar_xgb$data$feature))
-linewidth_xgb[vars_label(shap_imp_bar_xgb$data$feature) %in% all] <- .5
+linewidth_xgb[str_split(sapply(shap_imp_bar_xgb$data$feature, label_all), 
+                        " - ", simplify = TRUE)[,1] %in% all] <- .5
 linetype_xgb <- rep(0, length(shap_imp_bar_xgb$data$feature))
-linetype_xgb[vars_label(shap_imp_bar_xgb$data$feature) %in% all] <- 1
+linetype_xgb[str_split(sapply(shap_imp_bar_xgb$data$feature, label_all), 
+                       " - ", simplify = TRUE)[,1] %in% all] <- 1
 
 shap_imp_xgb_high <- shap_imp_bar_xgb +
   scale_y_discrete(labels = ~ if_else(
-    vars_label(.x) %in% c(all,log_xgb,xgb_lasso),
+    str_split(vars_label(.x)," - ", simplify = TRUE)[,1] %in% c(all,log_xgb,xgb_lasso),
     paste0("<span style='color: red4'><b>", vars_label(.x), "</b></span>"),
     vars_label(.x)
   )) +

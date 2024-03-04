@@ -4,7 +4,7 @@ library(tidymodels)
 library(gtsummary)
 library(ggpubr)
 library(modelr)
-
+library(readr)
 # Theme -----------------------------------------------------------------------
 plot_theme <- theme(
   plot.title = element_text(size = 25, hjust = 0.5),
@@ -20,6 +20,18 @@ line_size <- 1.2
 leg_size_4 <- 16
 
 # functions -------------------------------------------------------------------
+vars_dict <- read_csv("longevity_shap/vars_dict.csv",show_col_types = FALSE)
+
+label_get <- function(x) {ifelse(x %in% vars_dict$var,vars_dict[vars_dict$var == x,"name",drop = TRUE],x)}
+label_all <- function(x) {
+  ifelse(str_detect(x, "_@_"),
+         paste0(label_get(str_split(x, "_@_", simplify = TRUE)[,1])," - ",
+                label_get(str_split(x, "_@_", simplify = TRUE)[,2])),
+         label_get(x))
+}
+vars_label <- function(x) {sapply(x, label_all, USE.NAMES = FALSE)}
+var_get <- function(x) {ifelse(x %in% vars_dict$name,vars_dict[vars_dict$name == x,"var",drop = TRUE],x)}
+
 int_labeler <- function(x) {
   x <- str_remove_all(x, "s\\(|\\)|\\(")
   case_when(

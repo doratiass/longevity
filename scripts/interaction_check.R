@@ -6,7 +6,6 @@ library(mgcv)
 library(tidygam)
 library(viridis)
 source("~/Documents/stat_projects/longevity/scripts/funcs_def.R")
-source("~/Documents/stat_projects/longevity/longevity_shap/dict.R")
 set.seed(45)
 cat("\f")
 
