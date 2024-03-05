@@ -213,3 +213,11 @@ dps
 ggsave(filename = file.path("graphs","fig3.pdf"), plot = ggplot2::last_plot(), 
        width = 50, height = 35, dpi = 300, units = "cm", bg = "white")
 
+# save files -----------------------------------------------------------------
+save(deps, 
+     shap_exp_lasso, shap_exp_log, shap_imp_bar_xgb,
+     shap_imp_bee_xgb, shap_imp_lasso, shap_imp_log,
+     shap_lasso, shap_log, shap_xgb,
+     file = "raw_data/plots_shap.RData")
+
+save(shap_xgb, file = "/Users/doratias/Documents/stat_projects/private_data/longevity/shap.RData")
