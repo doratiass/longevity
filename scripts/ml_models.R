@@ -306,5 +306,5 @@ stopCluster(cl)
 save(df_split, df_train, df_test,
      step_model, log_train_fit, final_log_fit,
      final_lasso_fit, lasso_res, lasso_best_auc, lasso_train_fit,
-     final_xgb, final_xgb_fit, xgb_res, xgb_train_fit,
+     final_xgb, final_xgb_fit, xgb_res, xgb_train_fit,xgb_rec,
      file = "raw_data/model_data.RData")
