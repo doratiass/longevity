@@ -38,7 +38,75 @@ ml_df %>%
   modify_header(estimate = "**SMD**") %>%
   add_p()
 
-# Table 3 - ROC comparisons ---------------------------------------------------
+# supp table 1 - variables values ---------------------------------------------
+ml_df %>%
+  rename_all(function(x) sapply(x, label_get,USE.NAMES = FALSE)) 
+
+tibble(
+  vars = colnames(ml_df),
+  values = case_when(
+    sapply(ml_df, is.factor) ~ map_chr(ml_df, ~paste(unique(.x, na.rm = TRUE), collapse = ", ")),
+    sapply(ml_df, is.numeric) ~ map_chr(ml_df, ~paste(range(as.numeric(.x), na.rm = TRUE), collapse = " - ")),
+    TRUE ~ NA_character_),
+  label = map_chr(vars, label_get)
+) -> vars_table
+
+vars_table %>%
+  gt() %>%
+  tab_header(
+    title = "Supplementary Table 1 - Variables Values",
+    subtitle = "This table shows the range of values for each variable in the dataset."
+  ) %>%
+  fmt_number(columns = vars, decimals = 2) %>%
+  fmt_number(columns = values, decimals = 0) %>%
+  fmt_number(columns = label, decimals = 0) %>%
+  tab_spanner(
+    label = "Variable",
+    columns = vars
+  ) %>%
+  tab_spanner(
+    label = "Values",
+    columns = values
+  ) %>%
+  tab_spanner(
+    label = "Label",
+    columns = label
+  ) %>%
+  tab_source_note(
+    "Source: Authors' analysis of the dataset."
+  ) %>%
+  save(., file = "gt_vars_table.html")
+
+# supp table 2 - logistic variables -------------------------------------------
+step_model$anova %>%
+  rename(Variable = Step) %>%
+  mutate(Variable = str_split_i(Variable, "\\+ ", i=2),
+         Deviance = round(100*Deviance/step_model$null.deviance,2)) %>%
+  drop_na(Variable) %>%
+  select(Variable, Deviance) %>%
+  mutate(Variable = map_chr(Variable, label_all)) %>%
+  arrange(desc(Deviance)) %>%
+  gt() %>%
+  tab_header(
+    title = "Supplementary Table 2 - Logistic regression stepwise variables") %>%
+  save(., file = "log_stepwise_vars_table.html")
+
+# supp table 3 - lasso variables ----------------------------------------------
+final_lasso_fit %>%
+  extract_fit_parsnip() %>%
+  tidy() %>%
+  select(Variable = term,
+         Estimate = estimate) %>%
+  filter(Variable != "(Intercept)",
+         Estimate > 0) %>%
+  mutate(Variable = map_chr(Variable, label_all)) %>%
+  arrange(desc(Estimate)) %>%
+  gt() %>%
+  tab_header(
+    title = "Supplementary Table 3 - Lasso Variables") %>%
+  save(., file = "lasso_vars_table.html")
+
+# supp table 4 - ROC comparisons -----------------------------------------------
 bs_roc_log <- function(splits) {
   x <- analysis(splits)
   roc_auc(x, outcome, pred_log)$.estimate
@@ -85,70 +153,6 @@ bs_pred %>%
             ul = quantile(val, 0.975),
             ll = quantile(val, 0.025)) %>%
   filter(!str_detect(par, "roc_"))
-
-# supp table 1 - variables values ---------------------------------------------
-ml_df %>%
-  rename_all(function(x) sapply(x, label_get,USE.NAMES = FALSE)) 
-
-tibble(
-  vars = colnames(ml_df),
-  values = case_when(
-    sapply(ml_df, is.factor) ~ map_chr(ml_df, ~paste(unique(.x, na.rm = TRUE), collapse = ", ")),
-    sapply(ml_df, is.numeric) ~ map_chr(ml_df, ~paste(range(as.numeric(.x), na.rm = TRUE), collapse = " - ")),
-    TRUE ~ NA_character_),
-  label = map_chr(vars, label_get)
-) -> vars_table
-
-vars_table %>%
-  gt() %>%
-  tab_header(
-    title = "Supplementary Table 1 - Variables Values",
-    subtitle = "This table shows the range of values for each variable in the dataset."
-  ) %>%
-  fmt_number(columns = vars, decimals = 2) %>%
-  fmt_number(columns = values, decimals = 0) %>%
-  fmt_number(columns = label, decimals = 0) %>%
-  tab_spanner(
-    label = "Variable",
-    columns = vars
-  ) %>%
-  tab_spanner(
-    label = "Values",
-    columns = values
-  ) %>%
-  tab_spanner(
-    label = "Label",
-    columns = label
-  ) %>%
-  tab_source_note(
-    "Source: Authors' analysis of the dataset."
-  ) %>%
-  save(., file = "gt_vars_table.html")
-
-# lasso variables -------------------------------------------------------------
-final_lasso_fit %>%
-  extract_fit_parsnip() %>%
-  tidy() %>%
-  select(-penalty) %>%
-  filter(term != "(Intercept)",
-         estimate > 0) %>%
-  mutate(term = map_chr(term, label_all)) %>%
-  arrange(desc(estimate)) %>%
-  gt() %>%
-  tab_header(
-    title = "Supplementary Table 2 - Lasso Variables",
-    subtitle = "This table shows the variables selected by the Lasso model."
-  ) %>%
-  tab_spanner(
-    label = "Variable",
-    columns = term
-  ) %>%
-  tab_spanner(
-    label = "Estimate",
-    columns = estimate
-  )
-
-
 
 
 # Figure 1 - interactions -----------------------------------------------------

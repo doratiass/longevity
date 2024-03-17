@@ -33,7 +33,7 @@ pfun <- function(object, newdata) {  #, train = train_model
 step_model$anova %>%
   rename(var = Step) %>%
   mutate(var = str_remove(str_split_i(var, "\\+ ", i=2),regex("_poly_[1-3]")),
-         var = ifelse(var == "comp_SES_4cat", "dmg_SES", as.character(var))) %>%
+         Deviance = round(100*Deviance/step_model$null.deviance,2)) %>%
   drop_na(var) %>%
   head(var_num) %>%
   arrange(desc(Deviance)) -> log_imp_vars
@@ -80,7 +80,7 @@ shap_imp_log <- log_imp_vars %>%
   geom_col() +
   scale_x_discrete(labels = vars_label) +
   labs(x = "",#"Variable",
-       y = "Deviance") +
+       y = "Deviance (%)") +
   scale_fill_manual(values = log_features) +
   # scale_y_continuous(labels = scales::percent) +
   coord_flip()
