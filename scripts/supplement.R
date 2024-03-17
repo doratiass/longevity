@@ -1,14 +1,15 @@
 library(tidyverse)
 library(gtsummary)
 library(smd)
+library(gt)
 source("~/Documents/stat_projects/longevity/scripts/funcs_def.R")
 set.seed(45)
 cat("\f")
 
 # Table 2 - cohort characteristics --------------------------------------------
 vars <- unique(c(shap_imp_log$data$var,
-                              as.character(shap_imp_lasso$data$feature),
-                              as.character(shap_imp_bar_xgb$data$feature)))
+                 as.character(shap_imp_lasso$data$feature),
+                 as.character(shap_imp_bar_xgb$data$feature)))
 str_split(vars, "_@_", simplify = TRUE) %>%
   as_tibble() %>%
   select(V1) %>%
@@ -123,6 +124,32 @@ vars_table %>%
     "Source: Authors' analysis of the dataset."
   ) %>%
   save(., file = "gt_vars_table.html")
+
+# lasso variables -------------------------------------------------------------
+final_lasso_fit %>%
+  extract_fit_parsnip() %>%
+  tidy() %>%
+  select(-penalty) %>%
+  filter(term != "(Intercept)",
+         estimate > 0) %>%
+  mutate(term = map_chr(term, label_all)) %>%
+  arrange(desc(estimate)) %>%
+  gt() %>%
+  tab_header(
+    title = "Supplementary Table 2 - Lasso Variables",
+    subtitle = "This table shows the variables selected by the Lasso model."
+  ) %>%
+  tab_spanner(
+    label = "Variable",
+    columns = term
+  ) %>%
+  tab_spanner(
+    label = "Estimate",
+    columns = estimate
+  )
+
+
+
 
 # Figure 1 - interactions -----------------------------------------------------
 leg_size_4 <- 14

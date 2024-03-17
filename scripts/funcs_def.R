@@ -24,11 +24,15 @@ vars_dict <- read_csv("longevity_shap/vars_dict.csv",show_col_types = FALSE)
 
 label_get <- function(x) {ifelse(x %in% vars_dict$var,vars_dict[vars_dict$var == x,"name",drop = TRUE],x)}
 label_all <- function(x) {
-  ifelse(str_detect(x, "_@_"),
-         paste0(label_get(str_split(x, "_@_", simplify = TRUE)[,1])," - ",
-                label_get(str_split(x, "_@_", simplify = TRUE)[,2])),
-         label_get(x))
+  if(str_detect(x, "_@_")) {
+    paste0(label_get(str_split(x, "_@_", simplify = TRUE)[,1])," - ",
+           label_get(str_split(x, "_@_", simplify = TRUE)[,2]))}
+  else if (str_detect(x, "_poly_")) {
+    paste0(label_get(str_split(x, "_poly_", simplify = TRUE)[,1])," - poly ",
+           label_get(str_split(x, "_poly_", simplify = TRUE)[,2]))}
+  else {label_get(x)}
 }
+
 vars_label <- function(x) {sapply(x, label_all, USE.NAMES = FALSE)}
 var_get <- function(x) {ifelse(x %in% vars_dict$name,vars_dict[vars_dict$name == x,"var",drop = TRUE],x)}
 
@@ -141,7 +145,7 @@ cal_plot_three <- function(final_fit, train_fit, split = c("train", "test") ,pla
   df %>%
     mutate(outcome = as.numeric(outcome == "centenarian")) %>%
     ggplot(aes(.pred_centenarian, outcome, color = model)) +
-    geom_rug(aes(group=model),sides = "tb",alpha = 0.2) + #, color = "grey"
+    geom_rug(color = "grey",sides = "tb",alpha = 0.2) + 
     geom_smooth(linewidth = line_size, method = "loess", se = TRUE, fullrange = TRUE) +
     geom_abline(intercept = 0, slope = 1, linetype = "longdash") +
     geom_point(data = plot_txt, aes(x = 0.5, y = 0.2-0.05*inx), shape = 15, size = 3) +
@@ -272,7 +276,7 @@ cal_scam_plot_three <- function(final_fit, train_fit, split = c("train", "test")
   df %>%
     mutate(outcome = as.numeric(outcome == "centenarian")) %>%
     ggplot(aes(pred, outcome, color = model)) +
-    geom_rug(aes(group=model),sides = "tb",alpha = 0.2) + #, color = "grey"
+    geom_rug(color = "grey",sides = "tb",alpha = 0.2) + 
     geom_smooth(linewidth = line_size, method = "loess", se = TRUE, fullrange = TRUE) +
     geom_abline(intercept = 0, slope = 1, linetype = "longdash") +
     geom_point(data = plot_txt, aes(x = 0.5, y = 0.2-0.05*inx), shape = 15, size = 3) +
