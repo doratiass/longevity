@@ -204,7 +204,7 @@ for (i in 1:length(dps)) {
     scale_color_brewer(palette=color_pal) &
     geom_line(data = dps_int[[i]]$data,color = "black", linewidth = 1) &
     plot_theme &
-    theme_classic(base_size = 16)
+    theme_classic(base_size = 14)
 }
 
 dps

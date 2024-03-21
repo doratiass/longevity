@@ -26,11 +26,12 @@ ml_df %>%
          all_of(table_vars), "med_dm", "outcome") %>%
   rename_all(function(x) sapply(x, label_get,USE.NAMES = FALSE)) %>%
   tbl_summary(by = "outcome",
-              type = list(`dmg_SES` ~ "continuous",
+              type = list(`Socioeconomic Status quartile` ~ "continuous",
                           `Number of Occupants in the Household` ~ "continuous",
                           `Number of Rooms at Household` ~ "continuous"),
-              value = list(Diabetes ~ "Present",
-                           `Myocardial Infarction` ~ "Present"),
+              value = list(`Diabetes mellitus` ~ "Present",
+                           `Myocardial Infarction` ~ "Present",
+                           `Insulin use` ~ TRUE),
               missing = "no") %>%
   add_overall() %>%
   add_difference(everything() ~ "smd") %>%
@@ -99,7 +100,8 @@ final_lasso_fit %>%
          Estimate = estimate) %>%
   filter(Variable != "(Intercept)",
          Estimate > 0) %>%
-  mutate(Variable = map_chr(Variable, label_all)) %>%
+  mutate(Variable = map_chr(Variable, label_all),
+         Estimate = round(Estimate,4)) %>%
   arrange(desc(Estimate)) %>%
   gt() %>%
   tab_header(

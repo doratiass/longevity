@@ -23,10 +23,19 @@ leg_size_4 <- 16
 vars_dict <- read_csv("longevity_shap/vars_dict.csv",show_col_types = FALSE)
 
 label_get <- function(x) {ifelse(x %in% vars_dict$var,vars_dict[vars_dict$var == x,"name",drop = TRUE],x)}
+level_get <- function(x) {
+  if(str_detect(x, "X[0-9][0-9]\\.[0-9][0-9]")) {
+    str_replace_all(str_remove(x,"X"),"\\.","-")
+  } else if (str_detect(x, "X[0-9][0-9]\\.")) {
+    str_replace_all(str_remove(x,"X"),"\\.","+")
+  } else if (str_detect(x, "_")) {
+    str_replace_all(x,"_", " ")
+  } else {x}}
+
 label_all <- function(x) {
   if(str_detect(x, "_@_")) {
     paste0(label_get(str_split(x, "_@_", simplify = TRUE)[,1])," - ",
-           label_get(str_split(x, "_@_", simplify = TRUE)[,2]))}
+           level_get(str_split(x, "_@_", simplify = TRUE)[,2]))}
   else if (str_detect(x, "_poly_")) {
     paste0(label_get(str_split(x, "_poly_", simplify = TRUE)[,1])," - poly ",
            label_get(str_split(x, "_poly_", simplify = TRUE)[,2]))}
