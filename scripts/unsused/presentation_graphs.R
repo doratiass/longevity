@@ -67,7 +67,7 @@ ggarrange(cat_plot(ml_df, dmg_origin),
           font.label = list(size = 20, color = "black", face = "bold"),
           ncol = 2, nrow = 3)
 
-ggsave(filename = file.path("graphs","pres_eda.pdf"), plot = ggplot2::last_plot(), 
+ggsave(filename = file.path("graphs","pres_eda.png"), plot = ggplot2::last_plot(), 
        width = 50, height = 35, dpi = 300, units = "cm", bg = "white")
 
 # PDP plot --------------------------------------------------------------------
@@ -95,5 +95,5 @@ for (i in 1:length(dps)) {
 
 dps
 
-ggsave(filename = file.path("graphs","pres_pdp.pdf"), plot = ggplot2::last_plot(), 
+ggsave(filename = file.path("graphs","pres_pdp.png"), plot = ggplot2::last_plot(), 
        width = 50, height = 35, dpi = 300, units = "cm", bg = "white")
