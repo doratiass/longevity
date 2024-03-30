@@ -198,7 +198,7 @@ sv_dependence(shap_xgb, v = deps[1:12],
               alpha = 0.5, interactions = TRUE) -> dps_int
 
 for (i in 1:length(dps)) {
-  dps[[i]]$labels$title <- vars_label(dps[[i]]$labels$title)
+  dps[[i]]$labels$title <- paste0("(",LETTERS[i],") ", vars_label(dps[[i]]$labels$title))
   dps[[i]] <- dps[[i]] &
     labs(x = NULL) &
     scale_color_brewer(palette=color_pal) &

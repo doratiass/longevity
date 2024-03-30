@@ -63,7 +63,7 @@ miss_10_vars <- tibble(
   filter(p > 15) %>%
   pull(name)
 
-ml_df <- df_w_miss %>%
+  ml_df <- df_w_miss %>%
   select(-one_of(miss_10_vars))
 
 ## create ML data & general variables ------------------------------------------
@@ -303,7 +303,7 @@ xgb_train_fit <- fit_resamples(final_xgb,
 stopCluster(cl)
 
 # save ####
-save(df_split, df_train, df_test,
+save(ml_df,df_split, df_train, df_test,
      step_model, log_train_fit, final_log_fit,
      final_lasso_fit, lasso_res, lasso_best_auc, lasso_train_fit,
      final_xgb, final_xgb_fit, xgb_res, xgb_train_fit,xgb_rec,

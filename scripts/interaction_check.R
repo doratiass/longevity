@@ -73,20 +73,22 @@ plot_txt_int <- summary(gam_int) %$%
 ## Pan A ----------------------------------------------------------------------
 int_a <- sv_dependence(shap_xgb, v = "med_bmi_mean", 
                        color_var = "med_bmi_mean", 
-                       alpha = 0.5, interactions = TRUE)  +
+                       alpha = 0.5, interactions = FALSE) 
+
+int_a$data <- int_a$data %>%
+  mutate(bmi_group = factor(case_when(
+    between(med_bmi_mean, 0, 25) ~ "<25",
+    between(med_bmi_mean, 25, 27.5) ~ "25-27.5",
+    between(med_bmi_mean, 27.5, 30) ~ "27.5-30",
+    between(med_bmi_mean, 30, 100) ~ ">30"
+  ), levels = c("<25", "25-27.5", "27.5-30", ">30"))) %>%
+  drop_na(bmi_group)
+
+int_a <- int_a +
+  geom_point(aes(color = bmi_group), alpha = 0.5) +
   theme_classic() +
   plot_theme +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = leg_size_4),
-        legend.text = element_text(size = leg_size_4-2))
-
-
-sv_dependence(shap_xgb, v = "med_bmi_mean", 
-              color_var = "med_bmi_mean", 
-              alpha = 0.5, interactions = TRUE)  +
-  geom_vline(xintercept = 31, color = "gray30", linewidth = 0.5) +
-  theme_classic() +
-  plot_theme +
+  scale_color_viridis_d(begin = 0.25, end = 0.85, option = "inferno") +
   theme(legend.position = "bottom",
         legend.title = element_text(size = leg_size_4),
         legend.text = element_text(size = leg_size_4-2))
@@ -99,11 +101,15 @@ int_a
 int_b <- sv_dependence(shap_xgb_dic, v = "med_sbp_mean", 
                        color_var = "med_bmi_mean", 
                        alpha = 0.5, interactions = TRUE)  +
+  geom_smooth(se = FALSE) +
   theme_classic() +
   plot_theme +
   theme(legend.position = "bottom",
         legend.title = element_text(size = leg_size_4),
         legend.text = element_text(size = leg_size_4-2))
+
+int_b$data <- int_b$data %>%
+  drop_na(med_bmi_mean)
 
 int_b$labels$x <- vars_label(int_b$labels$x)
 int_b$labels$colour <- vars_label(int_b$labels$colour)
