@@ -130,7 +130,7 @@ int_c <- int_df %>%
   scale_y_continuous(limits = c(-6,-1.8)) +
   scale_color_viridis_d(begin = 0.25, end = 0.85, option = "inferno") +
   theme_classic() +
-  labs(y = "Probebility for Centerianism \n(log odds)",
+  labs(y = "Log odds",
        color = vars_label("med_bmi_mean")) +
   plot_theme +
   theme(legend.position = "bottom",
