@@ -68,8 +68,32 @@ xgb_shap_data <- bake(xgb_prep,
 
 shap_xgb <- shapviz(extract_fit_engine(final_xgb_fit), X_pred = xgb_shap_data,
                     interactions = TRUE)
-#  X = df_test,
-# collapse = list(med_smoke_status = c("med_smoke_status_X11.20", "med_smoke_status_X20.", "med_smoke_status_ex.smoker", "med_smoke_status_never.smoked")))
+### SHAP combined -------------------------------------------------------------
+shap_xgb_collapse <- shap_xgb
+
+shap_xgb_collapse$S <- collapse_shap(shap_xgb$S, 
+                           collapse = list(med_smoke_status = c("med_smoke_status_@_ex.smoker",
+                                                                "med_smoke_status_@_X1.10",
+                                                                "med_smoke_status_@_X11.20",
+                                                                "med_smoke_status_@_X20.")))
+
+
+shap_xgb_collapse$S_inter <- collapse_shap(shap_xgb$S_inter, 
+                           collapse = list(med_smoke_status = c("med_smoke_status_@_ex.smoker",
+                                                                "med_smoke_status_@_X1.10",
+                                                                "med_smoke_status_@_X11.20",
+                                                                "med_smoke_status_@_X20.")))
+
+shap_xgb_collapse$X <- shap_xgb$X %>%
+  mutate(med_smoke_status = case_when(`med_smoke_status_@_ex.smoker` == 1 ~ 1,
+                                      `med_smoke_status_@_X1.10` == 1 ~ 1,
+                                      `med_smoke_status_@_X11.20` == 1 ~ 1,
+                                      `med_smoke_status_@_X20.` == 1 ~ 1,
+                                      TRUE ~ 0)) %>%
+  select(-c("med_smoke_status_@_ex.smoker",
+            "med_smoke_status_@_X1.10",
+            "med_smoke_status_@_X11.20",
+            "med_smoke_status_@_X20."))
 
 # Figure 2 - variable importance -----------------------------------------------
 log_features = c("#F7D03CFF","#1B0C42FF","#FCFFA4FF","#CF4446FF","#fca50a",
@@ -94,14 +118,14 @@ shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE,
   scale_y_discrete(labels = vars_label)
 
 xgb_features = c("#4B0C6BFF","#781C6DFF","#A52C60FF","#CF4446FF","#fca50a",
-                 "#781C6DFF","#ED6925FF","#F7D03CFF","#fca50a","#fca50a")
+                 "#ED6925FF","#F7D03CFF","#fca50a","#fca50a","#FCFFA4FF")
 
-shap_imp_bar_xgb <- sv_importance(shap_xgb, kind = "bar", show_numbers = TRUE,
+shap_imp_bar_xgb <- sv_importance(shap_xgb_collapse, kind = "bar", show_numbers = TRUE,
                                   fill = xgb_features,
                                   max_display = var_num) +
   scale_y_discrete(labels = vars_label)
 
-shap_imp_bee_xgb <- sv_importance(shap_xgb, kind = "beeswarm", show_numbers = FALSE,
+shap_imp_bee_xgb <- sv_importance(shap_xgb_collapse, kind = "beeswarm", show_numbers = FALSE,
                                   max_display = var_num) +
   scale_y_discrete(labels = vars_label) +
   theme_classic() +

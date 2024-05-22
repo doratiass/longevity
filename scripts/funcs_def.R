@@ -34,8 +34,11 @@ level_get <- function(x) {
 
 label_all <- function(x) {
   if(str_detect(x, "_@_")) {
-    paste0(label_get(str_split(x, "_@_", simplify = TRUE)[,1])," - ",
-           level_get(str_split(x, "_@_", simplify = TRUE)[,2]))}
+    if (str_split(x, "_@_", simplify = TRUE)[,2] == "other_combined") {
+      label_get(str_split(x, "_@_", simplify = TRUE)[,1])
+    } else {
+      paste0(label_get(str_split(x, "_@_", simplify = TRUE)[,1])," - ",
+             level_get(str_split(x, "_@_", simplify = TRUE)[,2]))}}
   else if (str_detect(x, "_poly_")) {
     paste0(label_get(str_split(x, "_poly_", simplify = TRUE)[,1])," - poly ",
            label_get(str_split(x, "_poly_", simplify = TRUE)[,2]))}
