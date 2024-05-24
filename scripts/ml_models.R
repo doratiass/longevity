@@ -192,10 +192,10 @@ lasso_res %>%
 
 ## select best model -----------------------------------------------------------
 lasso_res %>%
-  show_best("roc_auc")
+  show_best(metric = "roc_auc")
 
 lasso_best_auc <- lasso_res %>%
-  select_best("roc_auc")
+  select_best(metric = "roc_auc")
 
 final_lasso <- finalize_workflow(
   lasso_wf,
@@ -260,7 +260,7 @@ xgb_grid <- grid_latin_hypercube(
 set.seed(2020)
 
 all_cores <- parallel::detectCores(logical = TRUE)
-cl <- makeCluster(all_cores-4)
+cl <- makeCluster(all_cores-2)
 registerDoParallel(cl)
 
 xgb_res <- tune_grid(
@@ -277,11 +277,11 @@ xgb_res %>%
 
 ## select best model ----------------------------------------------------------
 xgb_best_auc <- xgb_res %>%
-  show_best("roc_auc", n = 4)
+  show_best(metric = "roc_auc", n = 4)
 
 final_xgb <- finalize_workflow(
   xgb_wf,
-  xgb_best_auc[1,]
+  xgb_best_auc[2,]
 )
 
 final_xgb_fit <- final_xgb %>%

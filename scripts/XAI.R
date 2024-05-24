@@ -96,7 +96,7 @@ shap_xgb_collapse$X <- shap_xgb$X %>%
             "med_smoke_status_@_X20."))
 
 # Figure 2 - variable importance -----------------------------------------------
-log_features = c("#F7D03CFF","#1B0C42FF","#FCFFA4FF","#CF4446FF","#fca50a",
+log_features = c("#F78311FF","#1B0C42FF","#FCFFA4FF","#CF4446FF","#F5DB4BFF",
                  "#fca50a","#A52C60FF","#fca50a","#4B0C6BFF","#781C6DFF")
 
 shap_imp_log <- log_imp_vars %>%
@@ -110,7 +110,7 @@ shap_imp_log <- log_imp_vars %>%
   coord_flip()
 
 lasso_features = c("#4B0C6BFF","#781C6DFF","#1B0C42FF","#FCFFA4FF","#A52C60FF",
-                   "#CF4446FF","#F7D03CFF","#ED6925FF","#fca50a","#fca50a")
+                   "#CF4446FF","#F78311FF","#ED6925FF","#fca50a","#fca50a")
 
 shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE,
                                 fill = lasso_features,
@@ -118,7 +118,7 @@ shap_imp_lasso <- sv_importance(shap_lasso, kind = "bar", show_numbers = TRUE,
   scale_y_discrete(labels = vars_label)
 
 xgb_features = c("#4B0C6BFF","#781C6DFF","#A52C60FF","#CF4446FF","#fca50a",
-                 "#ED6925FF","#F7D03CFF","#fca50a","#fca50a","#FCFFA4FF")
+                 "#F78311FF","#ED6925FF","#FCFFA4FF","#fca50a","#F5DB4BFF")
 
 shap_imp_bar_xgb <- sv_importance(shap_xgb_collapse, kind = "bar", show_numbers = TRUE,
                                   fill = xgb_features,

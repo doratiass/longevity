@@ -1171,7 +1171,7 @@ bmi_sbp_data <- clean_df %>%
 
 ## labs ####
 labs_vars <- colnames(clean_df)[str_detect(colnames(clean_df),"lab")]
-
+labs_vars <- labs_vars[!(labs_vars %in% c("lab_hdl_63"))]
 labs_data <- clean_df %>%
   rowwise() %>%
   transmute(
@@ -1185,9 +1185,9 @@ labs_data <- clean_df %>%
       !is.na(lab_nonhdl_65) & !is.na(lab_nonhdl_63) ~ lab_nonhdl_63 - lab_nonhdl_65,
       TRUE ~ 0),
     lab_mean_hdl = mean(c_across(starts_with("lab_hdl")), na.rm = TRUE),
-    lab_range_hdl = case_when(
-      !is.na(lab_hdl_65) & !is.na(lab_hdl_63) ~ lab_hdl_63 - lab_hdl_65,
-      TRUE ~ 0),
+    # lab_range_hdl = case_when(
+    #   !is.na(lab_hdl_65) & !is.na(lab_hdl_63) ~ lab_hdl_63 - lab_hdl_65,
+    #   TRUE ~ 0),
     lab_glucose = lab_glucose_65,
     lab_hemoglobin = lab_hemoglobin_63,
     lab_hematocrit = lab_hematocrit_63,
@@ -1478,7 +1478,7 @@ final_df <- clean_df %>%
             all_of(mi_vars), all_of(angina_vars),
             all_of(pulmonary_vars),all_of(gen_med_vars),
             all_of(cancer_vars), all_of(comp_vars),
-            "dmg_concentration",
+            "dmg_concentration","lab_hdl_63",
             all_of(death_vars), all_of(unk_vars))) %>%
   left_join(bmi_sbp_data, by = "id_nivdaki") %>%
   left_join(smoke_data, by = "id_nivdaki") %>%
