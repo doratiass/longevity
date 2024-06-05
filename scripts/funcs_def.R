@@ -7,6 +7,7 @@ library(modelr)
 library(readr)
 # Theme -----------------------------------------------------------------------
 plot_theme <- theme(
+  #text = element_text(family = "Gill Sans"),
   plot.title = element_text(size = 25, hjust = 0.5),
   axis.title = element_text(size = 17),
   axis.text = element_text(size = 15),

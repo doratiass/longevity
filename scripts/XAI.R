@@ -86,9 +86,9 @@ shap_xgb_collapse$S_inter <- collapse_shap(shap_xgb$S_inter,
 
 shap_xgb_collapse$X <- shap_xgb$X %>%
   mutate(med_smoke_status = case_when(`med_smoke_status_@_ex.smoker` == 1 ~ 1,
-                                      `med_smoke_status_@_X1.10` == 1 ~ 1,
-                                      `med_smoke_status_@_X11.20` == 1 ~ 1,
-                                      `med_smoke_status_@_X20.` == 1 ~ 1,
+                                      `med_smoke_status_@_X1.10` == 1 ~ 2,
+                                      `med_smoke_status_@_X11.20` == 1 ~ 3,
+                                      `med_smoke_status_@_X20.` == 1 ~ 4,
                                       TRUE ~ 0)) %>%
   select(-c("med_smoke_status_@_ex.smoker",
             "med_smoke_status_@_X1.10",
@@ -197,12 +197,15 @@ shap_imp_xgb_high <- shap_imp_bar_xgb +
 ggarrange(shap_imp_log_high, shap_imp_lasso_high,
           shap_imp_xgb_high,
           shap_imp_bee_xgb + rremove("y.text")+ rremove("y.ticks")+ rremove("y.axis"),
-          labels = "AUTO",
+          labels = c("(A) Logistic Regression",
+                     "(B) LASSO","(C) XGBoost",
+                     "(D) Bee Swarm"),
+          label.y = 1,
           font.label = list(size = 20, color = "black", face = "bold"),
           ncol = 2, nrow = 2)
 
 ggsave(filename = file.path("graphs","fig2.pdf"), plot = ggplot2::last_plot(), 
-       width = 50, height = 35, dpi = 300, units = "cm", bg = "white")
+       width = 50, height = 35, dpi = 400, units = "cm", bg = "white")
 
 # Figure 3 - DP ---------------------------------------------------------------
 deps <- sv_importance(shap_xgb, kind = "bar", show_numbers = TRUE,

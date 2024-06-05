@@ -220,7 +220,7 @@ lasso_train_fit <- fit_resamples(final_lasso,
 
 stopCluster(cl)
 
-# XGBoost imputed model -------------------------------------------------------
+# XGBoost model ---------------------------------------------------------------
 ## prepare the data -----------------------------------------------------------
 xgb_rec <- recipe(outcome ~ ., data = df_train) %>%
   update_role(id_nivdaki, new_role = "ID") %>%
@@ -281,7 +281,7 @@ xgb_best_auc <- xgb_res %>%
 
 final_xgb <- finalize_workflow(
   xgb_wf,
-  xgb_best_auc[2,]
+  xgb_best_auc[1,]
 )
 
 final_xgb_fit <- final_xgb %>%

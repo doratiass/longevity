@@ -157,61 +157,39 @@ bs_pred %>%
   filter(!str_detect(par, "roc_"))
 
 
-# Figure 1 - interactions -----------------------------------------------------
-leg_size_4 <- 14
-
-int_a <- sv_dependence(shap_xgb, v = "med_sbp_mean", 
-                       color_var = "med_smoke_status_X20.", 
-                       alpha = 0.5, interactions = TRUE)  +
-  theme_classic() +
+# Figure 1 - pre-post calibration ----------------------------------------------
+pre_cal_train <- cal_scam_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
+                                     list(log_train_fit,lasso_train_fit,xgb_train_fit), 
+                                     split = "train",
+                                     plat = FALSE) +
   plot_theme +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = leg_size_4),
-        legend.text = element_text(size = leg_size_4-2))
+  scale_color_brewer(palette=color_pal)
 
-int_a$labels$x <- vars_label(int_a$labels$x)
-int_a$labels$colour <- vars_label(int_a$labels$colour)
-
-int_b <- sv_dependence(shap_xgb, v = "lab_glucose", 
-                       color_var = "dmg_education", 
-                       alpha = 0.5, interactions = TRUE)  +
-  theme_classic() +
+post_cal_train <- cal_scam_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
+                                      list(log_train_fit,lasso_train_fit,xgb_train_fit), 
+                                      split = "train",
+                                      plat = TRUE) +
   plot_theme +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = leg_size_4),
-        legend.text = element_text(size = leg_size_4-2))
+  scale_color_brewer(palette=color_pal)
 
-int_b$labels$x <- vars_label(int_b$labels$x)
-int_b$labels$colour <- vars_label(int_b$labels$colour)
-
-int_c <- sv_dependence(shap_xgb, v = "lab_mean_hdl", 
-                       color_var = "med_mi_other_combined", 
-                       alpha = 0.5, interactions = TRUE)  +
-  theme_classic() +
+pre_cal_test <- cal_scam_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
+                                    list(log_train_fit,lasso_train_fit,xgb_train_fit), 
+                                    split = "test",
+                                    plat = FALSE) +
   plot_theme +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = leg_size_4),
-        legend.text = element_text(size = leg_size_4-2))
+  scale_color_brewer(palette=color_pal)
 
-int_c$labels$x <- vars_label(int_c$labels$x)
-int_c$labels$colour <- vars_label(int_c$labels$colour)
-
-int_d <- sv_dependence(shap_xgb, v = "med_bmi_mean", 
-                       color_var = "med_dm_other_combined", 
-                       alpha = 0.5, interactions = TRUE)  +
-  theme_classic() +
+post_cal_test <- cal_scam_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
+                                     list(log_train_fit,lasso_train_fit,xgb_train_fit), 
+                                     split = "test",
+                                     plat = TRUE) +
   plot_theme +
-  theme(legend.position = "bottom",
-        legend.title = element_text(size = leg_size_4),
-        legend.text = element_text(size = leg_size_4-2))
+  scale_color_brewer(palette=color_pal)
 
-int_d$labels$x <- vars_label(int_d$labels$x)
-int_d$labels$colour <- vars_label(int_d$labels$colour)
-
-ggarrange(int_a, int_b, int_c, int_d,
+ggarrange(pre_cal_train,post_cal_train,pre_cal_test,post_cal_test,
           labels = "AUTO",
-          font.label = list(size = 20, color = "black", face = "bold"),
           ncol = 2, nrow = 2)
 
+
 ggsave(filename = file.path("graphs","supp_fig1.pdf"), plot = ggplot2::last_plot(), 
-       width = 45, height = 35, dpi = 300, units = "cm", bg = "white")
+       width = 35, height = 35, dpi = 300, units = "cm", bg = "white")
