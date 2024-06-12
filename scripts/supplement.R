@@ -89,7 +89,7 @@ step_model$anova %>%
   arrange(desc(Deviance)) %>%
   gt() %>%
   tab_header(
-    title = "Supplementary Table 2 - Logistic regression stepwise variables") %>%
+    title = "Supplementary Table 2 - Logistic regression stepwise variables") #%>%
   save(., file = "log_stepwise_vars_table.html")
 
 # supp table 3 - lasso variables ----------------------------------------------
@@ -105,7 +105,7 @@ final_lasso_fit %>%
   arrange(desc(Estimate)) %>%
   gt() %>%
   tab_header(
-    title = "Supplementary Table 3 - Lasso Variables") %>%
+    title = "Supplementary Table 3 - Lasso Variables") #%>%
   save(., file = "lasso_vars_table.html")
 
 # supp table 4 - ROC comparisons -----------------------------------------------
@@ -124,17 +124,17 @@ bs_roc_xgb <- function(splits) {
   roc_auc(x, outcome, pred_xgb)$.estimate
 }
 
-left_join(final_log_fit %>%
+left_join(final_xgb_fit %>%
             collect_predictions() %>%
-            select(.row, outcome, pred_log = .pred_centenarian),
+            select(.row, outcome, pred_xgb = .pred_centenarian),
           final_lasso_fit %>%
             collect_predictions() %>%
             select(.row, pred_lasso = .pred_centenarian), by = ".row") %>%
-  left_join(final_xgb_fit %>%
+  left_join(final_log_fit %>%
               collect_predictions() %>%
-              select(.row, pred_xgb = .pred_centenarian), by = ".row") -> final_preds
+              select(.row, pred_log = .pred_centenarian), by = ".row") -> final_preds 
 
-bs_pred <- bootstraps(final_preds, times = 1000)
+bs_pred <- bootstraps(final_preds %>% drop_na(), times = 1000)
 
 bs_pred %>% 
   mutate(
@@ -153,9 +153,10 @@ bs_pred %>%
   group_by(par) %>%
   summarise(mean = mean(val),
             ul = quantile(val, 0.975),
-            ll = quantile(val, 0.025)) %>%
-  filter(!str_detect(par, "roc_"))
-
+            ll = quantile(val, 0.025)) #%>%
+  # filter(par %in% c("roc_log", "roc_xgb")) %>%
+  # ggplot(aes(x = val, color = par)) +
+  # geom_density()
 
 # Figure 1 - pre-post calibration ----------------------------------------------
 pre_cal_train <- cal_scam_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
@@ -190,6 +191,5 @@ ggarrange(pre_cal_train,post_cal_train,pre_cal_test,post_cal_test,
           labels = "AUTO",
           ncol = 2, nrow = 2)
 
-
-ggsave(filename = file.path("graphs","supp_fig1.pdf"), plot = ggplot2::last_plot(), 
+ggsave(filename = file.path("graphs","supp_fig1.png"), plot = ggplot2::last_plot(), 
        width = 35, height = 35, dpi = 300, units = "cm", bg = "white")

@@ -9,12 +9,11 @@ source("~/Documents/stat_projects/longevity/scripts/funcs_def.R")
 set.seed(45)
 cat("\f")
 
-# ROC + PR ---------------------------------------------------------------------
-## summarise metrics -----------------------------------------------------------
+# summarise metrics -----------------------------------------------------------
 model_list <- list(final_log_fit,final_lasso_fit,final_xgb_fit)
 train_model_list <- list(log_train_fit,lasso_train_fit,xgb_train_fit)
 
-model_names <- c("Logistic regression","LASSO","XGBoost")
+model_names <- c("Logistic reg","LASSO","XGBoost")
 
 sum_models_list <- list()
 
@@ -53,7 +52,7 @@ sum_models %>%
             ul = quantile(val, 0.975),
             ll = quantile(val, 0.025)) -> pr_bootstrap
 
-## build ROC -------------------------------------------------------------------
+# build ROC -------------------------------------------------------------------
 log_roc <- final_log_fit %>%
   collect_predictions() %>%
   roc_curve(outcome, .pred_centenarian) %>%
@@ -78,7 +77,7 @@ xgb_roc <- final_xgb_fit %>%
                         sprintf(roc_bootstrap[3,3,drop=T], fmt = '%#.3f'),")"),
          inx = 3)
 
-## build PR ####
+# build PR ####
 log_pr <- final_log_fit %>%
   collect_predictions() %>%
   pr_curve(outcome, .pred_centenarian) %>%
@@ -103,8 +102,8 @@ xgb_pr <- final_xgb_fit %>%
                         sprintf(pr_bootstrap[3,3,drop=T], fmt = '%#.3f'),")"),
          inx = 3)
 
-## visualize models -----------------------------------------------------------
-### ROC -----------------------------------------------------------------------
+# visualize models -----------------------------------------------------------
+## ROC -----------------------------------------------------------------------
 roc_plot <- rbind(log_roc, lasso_roc, xgb_roc) %>% 
   ggplot(aes(x = 1 - specificity, y = sensitivity, color = model)) +
   geom_abline(
@@ -113,8 +112,8 @@ roc_plot <- rbind(log_roc, lasso_roc, xgb_roc) %>%
     linewidth = line_size
   ) +
   geom_path(linewidth = line_size) +
-  geom_point(aes(x = 0.3, y = 0.2-0.05*inx), shape = 15, size = 3) +
-  geom_text(aes(x = 0.35, y = 0.2-0.05*inx, label = model, size = 15),
+  geom_point(aes(x = 0.5, y = 0.2-0.05*inx), shape = 15, size = 3) +
+  geom_text(aes(x = 0.53, y = 0.2-0.05*inx, label = model, size = 15),
             color = "black", hjust = 0, check_overlap = T) +
   coord_equal() +
   theme_bw() +
@@ -123,15 +122,13 @@ roc_plot <- rbind(log_roc, lasso_roc, xgb_roc) %>%
   theme(legend.position = "none",
         legend.title = element_blank())
 
-roc_plot
-
-### PR ------------------------------------------------------------------------
+## PR ------------------------------------------------------------------------
 pr_plot <- rbind(log_pr, lasso_pr, xgb_pr) %>% 
   filter(!is.infinite(.threshold)) %>%
   ggplot(aes(x = recall, y = precision, color = model)) +
   geom_path() +
-  geom_point(aes(x = 0, y = 1-0.05*inx), shape = 15, size = 3) +
-  geom_text(aes(x = 0.05, y = 1-0.05*inx, label = model, size = 15),
+  geom_point(aes(x = 0.5, y = 1-0.05*inx), shape = 15, size = 3) +
+  geom_text(aes(x = 0.53, y = 1-0.05*inx, label = model, size = 15),
             color = "black", hjust = 0, check_overlap = T) +
   coord_equal() +
   theme_bw() +
@@ -140,15 +137,13 @@ pr_plot <- rbind(log_pr, lasso_pr, xgb_pr) %>%
   theme(legend.position = "none",
         legend.title = element_blank())
 
-### Calibration ---------------------------------------------------------------
+## Calibration ---------------------------------------------------------------
 cal_train <- cal_scam_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
                             list(log_train_fit,lasso_train_fit,xgb_train_fit), 
                             split = "train",
                             plat = TRUE) +
   plot_theme +
   scale_color_brewer(palette=color_pal)
-
-cal_train
 
 cal_test <- cal_scam_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
                            list(log_train_fit,lasso_train_fit,xgb_train_fit), 
@@ -157,15 +152,14 @@ cal_test <- cal_scam_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_f
   plot_theme +
   scale_color_brewer(palette=color_pal)
 
-cal_test
-
-### All together --------------------------------------------------------------
+# Final plot ------------------------------------------------------------------
 sums_plot <- ggarrange(roc_plot,  pr_plot, cal_train, cal_test,
                        labels = "AUTO",# label.y = 0.96,
                        ncol = 2, nrow = 2)
 
 sums_plot
 
+# Save -----------------------------------------------------------------------
 ggsave(filename = file.path("graphs","fig1.pdf"), plot = ggplot2::last_plot(), 
        width = 35, height = 35, dpi = 300, units = "cm", bg = "white")
 

@@ -26,10 +26,10 @@ cat("\f")
 
 # data ------------------------------------------------------------------------
 labels <- list(
-  list("med_sbp_mean",tibble(x_mark = c(109, 121, 133, 140, 152, 163))),
+  list("med_sbp_mean",tibble(x_mark = c(121, 133, 152, 163))),
   list("lab_mean_hdl",tibble(x_mark = c(42,55))),
-  list("lab_glucose",tibble(x_mark = c(85,100,110,130))),
-  list("med_bmi_mean",tibble(x_mark = c(19.8,24.5,27.5, 31)))
+  list("lab_glucose",tibble(x_mark = c(85,100,110,130, 140))),
+  list("med_bmi_mean",tibble(x_mark = c(20,25,27.5, 31)))
 )
 
 sv_dependence(shap_xgb, v = labels[[1]][[1]], 
@@ -80,7 +80,6 @@ dp_line_1 +
   geom_text(
     data = labels[[1]][[2]],
     mapping = aes(x = x_mark, y = max(dp_line_1$data$shap), label = x_mark),
-    #    colour = text_col,
     # family = body_font,
     size = 5
   ) +
@@ -103,7 +102,6 @@ dp_line_2 +
   geom_text(
     data = labels[[2]][[2]],
     mapping = aes(x = x_mark, y = max(dp_line_2$data$shap), label = x_mark),
-    #    colour = text_col,
     # family = body_font,
     size = 5
   ) +
@@ -126,7 +124,6 @@ dp_line_3 +
   geom_text(
     data = labels[[3]][[2]],
     mapping = aes(x = x_mark, y = max(dp_line_3$data$shap), label = x_mark),
-    #    colour = text_col,
     # family = body_font,
     size = 5
   ) +
@@ -149,8 +146,7 @@ dp_line_4 +
   geom_text(
     data = labels[[4]][[2]],
     mapping = aes(x = x_mark, y = max(dp_line_4$data$shap), label = x_mark),
-    #    colour = text_col,
-    #family = body_font,
+    # family = body_font,
     size = 5
   ) +
   theme_classic(base_size = 14) +
@@ -162,5 +158,5 @@ annotate_figure(ggarrange(mp_1 + rremove("y.title"), mp_2 + rremove("y.title"),
                           ncol = 2, nrow = 2), 
                 left = textGrob("SHAP value", rot = 90, vjust = 1, gp = gpar(cex = 1.8)))
 
-ggsave(filename = file.path("graphs",paste0("fig_3_new.png")), plot = ggplot2::last_plot(), 
+ggsave(filename = file.path("graphs",paste0("fig_3.png")), plot = ggplot2::last_plot(), 
        width = 50, height = 30, dpi = 400, units = "cm", bg = "white")

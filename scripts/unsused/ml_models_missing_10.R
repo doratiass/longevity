@@ -38,7 +38,7 @@ new_sep_names <- function(var, lvl, ordinal) {
 ## add outcome to data --------------------------------------------------------
 load("raw_data/final_df.RData")
 
-ml_df <- final_df %>%
+df_w_miss <- final_df %>%
   select(starts_with(c("id_nivdaki", "outcome_age_lfu",
                        "dmg_","med_", "lab_","physical_",
                        "work_","family_","diet_", "comp_"))) %>%
@@ -56,12 +56,15 @@ ml_df <- final_df %>%
 
 ## remove missing > 10 % ------------------------------------------------------
 miss_10_vars <- tibble(
-  name = colnames(ml_df),
-  NAs = sapply(ml_df, function(x) sum(is.na(x))),
-  p = round(NAs/nrow(ml_df)*100,2)
+  name = colnames(df_w_miss),
+  NAs = sapply(df_w_miss, function(x) sum(is.na(x))),
+  p = round(NAs/nrow(df_w_miss)*100,2)
 ) %>%
-  filter(p > 10) %>%
+  filter(p > 15) %>%
   pull(name)
+
+ml_df <- df_w_miss %>%
+  select(-one_of(miss_10_vars))
 
 ## create ML data & general variables ------------------------------------------
 set.seed(1234)
@@ -70,35 +73,31 @@ df_train <- training(df_split)
 df_test <- testing(df_split)
 df_train_cv <- vfold_cv(df_train, v = 10, strata = outcome)
 
-### impute train data ----------------------------------------------------------
-imp_rec <- recipe(outcome ~ ., data = df_train %>% select(-id_nivdaki)) %>%
-  step_rm(all_of(c("dmg_immigration_year","med_vital_capacity_index",
-                   "med_fev","med_shoulder_measure_cm_biacromial" ,
-                   "med_pelvic_measure_cm_bicristal","med_left_eye_pressure",
-                   "med_right_eye_pressure","med_vital_capacity",
-                   "med_timed_vital_capacity","med_fvc_68",
-                   "work_hurt_by_superior_forget","work_hurt_by_superior_restrain_retaliate",
-                   "family_conflict_with_wife","comp_forced_pv"))) %>%
+# logistic regression ----------------------------------------------------------
+## prepare the data -----------------------------------------------------------
+log_rec_step <- recipe(outcome ~ ., data = df_train %>% select(-id_nivdaki)) %>%
   step_impute_knn(all_predictors(), neighbors = 3) %>%
+  step_zv(all_numeric_predictors()) %>%
+  #step_poly(all_numeric_predictors(), degree = 3) %>% 
   step_date(all_date_predictors(), keep_original_cols = FALSE, features = "month") %>%
-  step_corr(all_numeric_predictors(), threshold = thresh_corr, method = "spearman")
+  step_other(all_nominal_predictors(), threshold = thresh_other, other = "other_combined") %>%
+  step_corr(all_numeric_predictors(), threshold = thresh_corr)
 
-imp_prep <- imp_rec %>%
+log_prep_step <- log_rec_step %>%
   prep(strings_as_factors = FALSE,
        log_changes = TRUE,
        verbose = TRUE)
 
-imp_train_df <- bake(imp_prep, df_train)
-
-# logistic regression ----------------------------------------------------------
+log_bake <- bake(log_prep_step, df_train)
+log_bake_test <- bake(log_prep_step, df_test)
 ## stepwise AIC ---------------------------------------------------------------
-nullModel <- glm(outcome ~ 1, data = imp_train_df, family = binomial)
-fullModel <- glm(outcome ~ ., data = imp_train_df, family = binomial)
+nullModel <- glm(outcome ~ 1, data = log_bake, family = binomial)
+fullModel <- glm(outcome ~ ., data = log_bake, family = binomial)
 
-step_model <- stepAIC(nullModel, 
-                      direction = 'forward', 
-                      scope = list(upper = fullModel, 
-                                   lower = nullModel),
+step_model <- stepAIC(nullModel, # start with a model containing no variables
+                      direction = 'forward', # run forward selection
+                      scope = list(upper = fullModel, # the maximum to consider is a model with all variables
+                                   lower = nullModel), # the minimum to consider is a model with no variables
                       trace = 1)
 
 summary(step_model)
@@ -107,10 +106,17 @@ step_model_formula <- reformulate(unique(str_remove(str_remove(
   strsplit(as.character(step_model$formula)[[3]], " + ", fixed = TRUE)[[1]],
   regex("_poly_[1-3]")), "\n    ")),"outcome")
 
+# step_model_formula <- reformulate(unique(str_remove(str_remove(
+#   strsplit(str_replace_all(str_replace_all(as.character(step_model$formula)[[3]], 
+#                                            "comp_SES_4cat", "dmg_SES"),
+#                            "comp_pcpoly", "med_pcpoly"), " + ", fixed = TRUE)[[1]], 
+#   regex("_poly_[1-3]")), "\n    ")),"outcome")
+
 ## fit model ------------------------------------------------------------------
-log_rec <- recipe(update(step_model_formula, ~ . + id_nivdaki), data = df_train) %>%
+log_rec <- recipe(update(step_model_formula, ~ . + id_nivdaki - comp_SES_4cat + dmg_SES), data = df_train) %>%
   update_role(id_nivdaki, new_role = "ID") %>%
   step_impute_knn(all_predictors(), neighbors = 3) %>%
+  #step_poly(all_numeric_predictors(), degree = 3) %>%
   step_date(all_date_predictors(), keep_original_cols = FALSE, features = "month")%>%
   step_zv(all_numeric_predictors()) %>%
   step_other(all_nominal_predictors(), threshold = thresh_other, other = "other_combined") %>%
@@ -145,15 +151,9 @@ stopCluster(cl)
 # LASSO imputed model ----------------------------------------------------------
 ## prepare the data -----------------------------------------------------------
 lasso_rec <- recipe(outcome ~ ., data = df_train) %>%
-  step_rm(all_of(c("dmg_immigration_year","med_vital_capacity_index",
-                   "med_fev","med_shoulder_measure_cm_biacromial" ,
-                   "med_pelvic_measure_cm_bicristal","med_left_eye_pressure",
-                   "med_right_eye_pressure","med_vital_capacity",
-                   "med_timed_vital_capacity","med_fvc_68",
-                   "work_hurt_by_superior_forget","work_hurt_by_superior_restrain_retaliate",
-                   "family_conflict_with_wife","comp_forced_pv"))) %>%
   update_role(id_nivdaki, new_role = "ID") %>%
   step_impute_knn(all_predictors(), neighbors = 3) %>%
+  #step_poly(all_numeric_predictors(),degree = 3) %>% 
   step_date(all_date_predictors(), keep_original_cols = FALSE, features = "month")%>%
   step_other(all_nominal_predictors(), threshold = thresh_other, other = "other_combined") %>%
   step_dummy(all_nominal_predictors(), naming = new_sep_names) %>%
@@ -281,7 +281,7 @@ xgb_best_auc <- xgb_res %>%
 
 final_xgb <- finalize_workflow(
   xgb_wf,
-  xgb_best_auc[1,]
+  xgb_best_auc[2,]
 )
 
 final_xgb_fit <- final_xgb %>%
@@ -303,7 +303,7 @@ xgb_train_fit <- fit_resamples(final_xgb,
 stopCluster(cl)
 
 # save ####
-save(ml_df,df_split, df_train, df_test, imp_train_df,
+save(ml_df,df_split, df_train, df_test,
      step_model, log_train_fit, final_log_fit,
      final_lasso_fit, lasso_res, lasso_best_auc, lasso_train_fit,
      final_xgb, final_xgb_fit, xgb_res, xgb_train_fit,xgb_rec,

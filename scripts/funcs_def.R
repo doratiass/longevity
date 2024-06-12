@@ -162,7 +162,7 @@ cal_plot_three <- function(final_fit, train_fit, split = c("train", "test") ,pla
     geom_smooth(linewidth = line_size, method = "loess", se = TRUE, fullrange = TRUE) +
     geom_abline(intercept = 0, slope = 1, linetype = "longdash") +
     geom_point(data = plot_txt, aes(x = 0.5, y = 0.2-0.05*inx), shape = 15, size = 3) +
-    geom_text(data = plot_txt, aes(x = 0.55, y = 0.2-0.05*inx, label = txt, size = 15),
+    geom_text(data = plot_txt, aes(x = 0.53, y = 0.2-0.05*inx, label = txt, size = 15),
               color = "black", hjust = 0) +
     labs(x = "Predicted risk",
          y = "Observed proportion") +
@@ -293,7 +293,7 @@ cal_scam_plot_three <- function(final_fit, train_fit, split = c("train", "test")
     geom_smooth(linewidth = line_size, method = "loess", se = TRUE, fullrange = TRUE) +
     geom_abline(intercept = 0, slope = 1, linetype = "longdash") +
     geom_point(data = plot_txt, aes(x = 0.5, y = 0.2-0.05*inx), shape = 15, size = 3) +
-    geom_text(data = plot_txt, aes(x = 0.55, y = 0.2-0.05*inx, label = txt, size = 15),
+    geom_text(data = plot_txt, aes(x = 0.53, y = 0.2-0.05*inx, label = txt, size = 15),
               color = "black", hjust = 0) +
     labs(x = "Predicted risk",
          y = "Observed proportion") +
