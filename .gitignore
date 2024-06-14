@@ -47,3 +47,5 @@ graphs/
 presentations/
 scripts/save_shap.R
 scripts/unused
+longevity.qmd
+.gitignore
