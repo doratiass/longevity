@@ -26,7 +26,7 @@ cat("\f")
 
 # data ------------------------------------------------------------------------
 labels <- list(
-  list("med_sbp_mean",tibble(x_mark = c(121, 133, 152, 163))),
+  list("med_dbp_mean",tibble(x_mark = c(80, 84, 93))),
   list("lab_mean_hdl",tibble(x_mark = c(42,55))),
   list("lab_glucose",tibble(x_mark = c(85,100,110,130, 140))),
   list("med_bmi_mean",tibble(x_mark = c(20,25,27.5, 31)))
@@ -76,7 +76,7 @@ dp_line_1 +
     linetype = "dashed",
     alpha = 0.4
   ) +
-  coord_cartesian(xlim = c(min(dp_line_1$data$med_sbp_mean), 200)) +
+  coord_cartesian(xlim = c(60, 120)) +
   geom_text(
     data = labels[[1]][[2]],
     mapping = aes(x = x_mark, y = max(dp_line_1$data$shap), label = x_mark),
