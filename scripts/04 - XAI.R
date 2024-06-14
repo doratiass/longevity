@@ -253,4 +253,5 @@ save(imp_train_df, log_sum_dev, lasso_sum_dev,
      log_imp_vars, lasso_imp_vars, shap_xgb,
      file = "raw_data/plots_shap.RData")
 
-save(shap_xgb, file = "/Users/doratias/Documents/stat_projects/private_data/longevity/shap.RData")
+save(shap_xgb, 
+     file = "raw_data/shap.RData")
