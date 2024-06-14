@@ -165,6 +165,11 @@ lasso_spec <- logistic_reg(penalty = tune(), mixture = 1) %>%
   set_engine("glmnet") %>%
   set_mode('classification')
 
+lasso_prep <- lasso_rec %>%        # for later use in SHAP
+  prep(strings_as_factors = FALSE,
+       log_changes = TRUE,
+       verbose = TRUE)
+
 lambda_grid <- grid_regular(penalty(), levels = 1000)
 
 ## setup the model & tune hyperparameters --------------------------------------
@@ -230,6 +235,11 @@ xgb_rec <- recipe(outcome ~ ., data = df_train) %>%
   step_dummy(all_nominal_predictors(), naming = new_sep_names) %>%
   step_zv(all_numeric_predictors()) %>% 
   step_corr(all_numeric_predictors(), threshold = thresh_corr, method = "spearman")
+
+xgb_prep <- xgb_rec %>%
+  prep(strings_as_factors = FALSE,
+       log_changes = TRUE,
+       verbose = TRUE)
 
 ## setup the model & tune hyperparameters -------------------------------------
 xgb_spec <- boost_tree(
@@ -305,6 +315,6 @@ stopCluster(cl)
 # save ####
 save(ml_df,df_split, df_train, df_test, imp_train_df,
      step_model, log_train_fit, final_log_fit,
-     final_lasso_fit, lasso_res, lasso_best_auc, lasso_train_fit,
-     final_xgb, final_xgb_fit, xgb_res, xgb_train_fit,xgb_rec,
+     lasso_res, lasso_prep, lasso_best_auc, final_lasso_fit, lasso_train_fit,
+     final_xgb, final_xgb_fit, xgb_res, xgb_train_fit,xgb_rec, xgb_prep,
      file = "raw_data/model_data.RData")

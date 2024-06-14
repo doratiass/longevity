@@ -163,3 +163,5 @@ sums_plot
 ggsave(filename = file.path("graphs","fig1.pdf"), plot = ggplot2::last_plot(), 
        width = 35, height = 35, dpi = 300, units = "cm", bg = "white")
 
+save(log_roc, lasso_roc, xgb_roc, log_pr, lasso_pr, xgb_pr,
+     file = "raw_data/roc_data.RData")
