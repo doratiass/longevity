@@ -37,6 +37,9 @@ label_all <- function(x) {
   if(str_detect(x, "_@_")) {
     if (str_split(x, "_@_", simplify = TRUE)[,2] == "other_combined") {
       label_get(str_split(x, "_@_", simplify = TRUE)[,1])
+    } else if (str_detect(str_split(x, "_@_", simplify = TRUE)[,2], "\\.")) {
+      paste0(label_get(str_split(x, "_@_", simplify = TRUE)[,1])," - ",
+             str_replace_all(str_split(x, "_@_", simplify = TRUE)[,2], "\\.", " "))
     } else {
       paste0(label_get(str_split(x, "_@_", simplify = TRUE)[,1])," - ",
              level_get(str_split(x, "_@_", simplify = TRUE)[,2]))}}

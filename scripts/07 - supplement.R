@@ -1,4 +1,5 @@
 library(tidyverse)
+library(tidymodels)
 library(gtsummary)
 library(smd)
 library(gt)
@@ -124,6 +125,21 @@ bs_roc_xgb <- function(splits) {
   roc_auc(x, outcome, pred_xgb)$.estimate
 }
 
+bs_pr_log <- function(splits) {
+  x <- analysis(splits)
+  pr_auc(x, outcome, pred_log)$.estimate
+}
+
+bs_pr_lasso <- function(splits) {
+  x <- analysis(splits)
+  pr_auc(x, outcome, pred_lasso)$.estimate
+}
+
+bs_pr_xgb <- function(splits) {
+  x <- analysis(splits)
+  pr_auc(x, outcome, pred_xgb)$.estimate
+}
+
 left_join(final_xgb_fit %>%
             collect_predictions() %>%
             select(.row, outcome, pred_xgb = .pred_centenarian),
@@ -140,12 +156,18 @@ bs_pred %>%
   mutate(
     roc_log = map_dbl(splits, bs_roc_log),
     roc_lasso = map_dbl(splits, bs_roc_lasso),
-    roc_xgb = map_dbl(splits, bs_roc_xgb)
+    roc_xgb = map_dbl(splits, bs_roc_xgb),
+    pr_log = map_dbl(splits, bs_pr_log),
+    pr_lasso = map_dbl(splits, bs_pr_lasso),
+    pr_xgb = map_dbl(splits, bs_pr_xgb)
   ) %>%
   mutate(
-    xgb_lasso = roc_xgb - roc_lasso,
-    xgb_log = roc_xgb - roc_log,
-    lasso_log = roc_lasso - roc_log
+    roc_xgb_lasso = roc_xgb - roc_lasso,
+    roc_xgb_log = roc_xgb - roc_log,
+    roc_lasso_log = roc_lasso - roc_log,
+    pr_xgb_lasso = pr_xgb - pr_lasso,
+    pr_xgb_log = pr_xgb - pr_log,
+    pr_lasso_log = pr_lasso - pr_log
   ) %>%
   pivot_longer(cols = !c(splits, id),
                values_to = "val",
@@ -153,10 +175,7 @@ bs_pred %>%
   group_by(par) %>%
   summarise(mean = mean(val),
             ul = quantile(val, 0.975),
-            ll = quantile(val, 0.025)) #%>%
-  # filter(par %in% c("roc_log", "roc_xgb")) %>%
-  # ggplot(aes(x = val, color = par)) +
-  # geom_density()
+            ll = quantile(val, 0.025))
 
 # Figure 1 - pre-post calibration ----------------------------------------------
 pre_cal_train <- cal_scam_plot_three(list(final_log_fit, final_lasso_fit, final_xgb_fit),
