@@ -1,19 +1,38 @@
-# Longevity predictors study
+# Longevity Predictors Study
 
-This study uses a well known database of 10058 men recruited in 1963 and were followed up for 5 years to investigate ischemic heart disease incidence (Medalie et al. 1973). 
-The goal is to predict longevity using mid-life predictors.
+This repository contains the complete R code for our study on predicting longevity using mid-life predictors. We analyze a historical cohort of 10,058 men recruited in 1963, who were followed up for 5 years to assess ischemic heart disease incidence (Medalie et al. 1973). Our goal is to compare traditional epidemiological methods (e.g., logistic regression) with modern machine learning techniques (LASSO regression and XGBoost) for predicting extreme longevity (near-centenarianism). We also apply explainable AI tools (SHAP) to enhance model interpretability.
 
-## **Code Repository**
+------------------------------------------------------------------------
 
-The complete code for this study is available in the main branch under`/code/scripts` directory. 
-Due to privacy considerations, the dataset cannot be shared.
+# Repository Overview
 
-## **Results**
+-   **Data Privacy:**\
+    Due to privacy considerations, the dataset used in this study is not publicly shared.
 
-The full output of the study can be accessed [here](https://doratiass.github.io/longevity/).
+-   **Code Structure:**\
+    All analysis scripts are located in the `/code/scripts` directory. Key scripts include:
 
-## **SHAP Values Investigation**
+    -   **00 - funcs_def.R:** Function definitions and helper routines.
+    -   **01 - int.R:** Data import and cleaning.
+    -   **02 - ml_models.R:** Model fitting using tidymodels (logistic regression, LASSO, XGBoost).
+    -   **03 - model_assesment.R:** Model discrimination and calibration assessment.
+    -   **04 - XAI.R:** SHAP analysis for model interpretability.
+    -   **05 - fig_3_dp.R:** Partial dependency plots.
+    -   **06 - interaction_check.R:** Exploration and visualization of interactions.
+    -   **07 - supplement.R:** Supplementary material and additional tables.
 
-An online tool for exploring SHAP (Shapley additive explanations) values is provided at this [link](https://dorati-longevity-shap.hf.space).
+-   **Results and Outputs:**
 
-Feel free to explore the results and engage with the interactive tool. If you have any questions or feedback, please don't hesitate to reach out.
+    -   The full output of our study is available [here](https://doratiass.github.io/longevity/).
+    -   The manuscript, titled “Machine learning in epidemiology: an introduction, comparison with traditional methods, and a case study of predicting extreme longevity”, is currently under review.
+    -   An interactive SHAP values exploration tool can be accessed [here](https://dorati-longevity-shap.hf.space).
+
+------------------------------------------------------------------------
+
+For questions, feedback, or collaboration inquiries, please contact the corresponding author:
+
+Prof. Uri Obolski, Ph.D.
+
+Tel Aviv University, School of Public Health
+
+Email: [uriobols\@tauex.tau.ac.il](mailto:uriobols@tauex.tau.ac.il){.email}
