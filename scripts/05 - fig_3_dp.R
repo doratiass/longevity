@@ -52,37 +52,69 @@ labels <- list(
   list("med_bmi_mean", tibble(x_mark = c(20, 25, 27.5, 31)))
 )
 
-sv_dependence(shap_xgb, v = labels[[1]][[1]], 
-              color_var = NULL, 
-              alpha = 0.5, interactions = FALSE) -> dp_line_1
+sv_dependence(
+  shap_xgb,
+  v = labels[[1]][[1]],
+  color_var = NULL,
+  alpha = 0.5,
+  interactions = FALSE
+) -> dp_line_1
 
-sv_dependence(shap_xgb, v = labels[[1]][[1]], 
-              color_var = NULL, 
-              alpha = 0.5, interactions = TRUE) -> dps_int_line_1
+sv_dependence(
+  shap_xgb,
+  v = labels[[1]][[1]],
+  color_var = NULL,
+  alpha = 0.5,
+  interactions = TRUE
+) -> dps_int_line_1
 
-sv_dependence(shap_xgb, v = labels[[2]][[1]], 
-              color_var = NULL, 
-              alpha = 0.5, interactions = FALSE) -> dp_line_2
+sv_dependence(
+  shap_xgb,
+  v = labels[[2]][[1]],
+  color_var = NULL,
+  alpha = 0.5,
+  interactions = FALSE
+) -> dp_line_2
 
-sv_dependence(shap_xgb, v = labels[[2]][[1]], 
-              color_var = NULL, 
-              alpha = 0.5, interactions = TRUE) -> dps_int_line_2
+sv_dependence(
+  shap_xgb,
+  v = labels[[2]][[1]],
+  color_var = NULL,
+  alpha = 0.5,
+  interactions = TRUE
+) -> dps_int_line_2
 
-sv_dependence(shap_xgb, v = labels[[3]][[1]], 
-              color_var = NULL, 
-              alpha = 0.5, interactions = FALSE) -> dp_line_3
+sv_dependence(
+  shap_xgb,
+  v = labels[[3]][[1]],
+  color_var = NULL,
+  alpha = 0.5,
+  interactions = FALSE
+) -> dp_line_3
 
-sv_dependence(shap_xgb, v = labels[[3]][[1]], 
-              color_var = NULL, 
-              alpha = 0.5, interactions = TRUE) -> dps_int_line_3
+sv_dependence(
+  shap_xgb,
+  v = labels[[3]][[1]],
+  color_var = NULL,
+  alpha = 0.5,
+  interactions = TRUE
+) -> dps_int_line_3
 
-sv_dependence(shap_xgb, v = labels[[4]][[1]], 
-              color_var = NULL, 
-              alpha = 0.5, interactions = FALSE) -> dp_line_4
+sv_dependence(
+  shap_xgb,
+  v = labels[[4]][[1]],
+  color_var = NULL,
+  alpha = 0.5,
+  interactions = FALSE
+) -> dp_line_4
 
-sv_dependence(shap_xgb, v = labels[[4]][[1]], 
-              color_var = NULL, 
-              alpha = 0.5, interactions = TRUE) -> dps_int_line_4
+sv_dependence(
+  shap_xgb,
+  v = labels[[4]][[1]],
+  color_var = NULL,
+  alpha = 0.5,
+  interactions = TRUE
+) -> dps_int_line_4
 
 # ============================================================================ #
 # Create Partial Dependency Plots (PDPs) --------------------------------------
@@ -93,9 +125,12 @@ mp_1 <- dp_line_1 +
   geom_line(data = dps_int_line_1$data, color = "black", linewidth = 1) +
   geom_segment(
     data = labels[[1]][[2]],
-    mapping = aes(x = x_mark, xend = x_mark, 
-                  y = min(dp_line_1$data$shap), 
-                  yend = max(dp_line_1$data$shap) * 0.9),
+    mapping = aes(
+      x = x_mark,
+      xend = x_mark,
+      y = min(dp_line_1$data$shap),
+      yend = max(dp_line_1$data$shap) * 0.9
+    ),
     linetype = "dashed",
     alpha = 0.4
   ) +
@@ -114,9 +149,12 @@ mp_2 <- dp_line_2 +
   geom_line(data = dps_int_line_2$data, color = "black", linewidth = 1) +
   geom_segment(
     data = labels[[2]][[2]],
-    mapping = aes(x = x_mark, xend = x_mark, 
-                  y = min(dp_line_2$data$shap), 
-                  yend = max(dp_line_2$data$shap) * 0.9),
+    mapping = aes(
+      x = x_mark,
+      xend = x_mark,
+      y = min(dp_line_2$data$shap),
+      yend = max(dp_line_2$data$shap) * 0.9
+    ),
     linetype = "dashed",
     alpha = 0.4
   ) +
@@ -135,9 +173,12 @@ mp_3 <- dp_line_3 +
   geom_line(data = dps_int_line_3$data, color = "black", linewidth = 1) +
   geom_segment(
     data = labels[[3]][[2]],
-    mapping = aes(x = x_mark, xend = x_mark, 
-                  y = min(dp_line_3$data$shap), 
-                  yend = max(dp_line_3$data$shap) * 0.9),
+    mapping = aes(
+      x = x_mark,
+      xend = x_mark,
+      y = min(dp_line_3$data$shap),
+      yend = max(dp_line_3$data$shap) * 0.9
+    ),
     linetype = "dashed",
     alpha = 0.4
   ) +
@@ -156,9 +197,12 @@ mp_4 <- dp_line_4 +
   geom_line(data = dps_int_line_4$data, color = "black", linewidth = 1) +
   geom_segment(
     data = labels[[4]][[2]],
-    mapping = aes(x = x_mark, xend = x_mark, 
-                  y = min(dp_line_4$data$shap), 
-                  yend = max(dp_line_4$data$shap) * 0.9),
+    mapping = aes(
+      x = x_mark,
+      xend = x_mark,
+      y = min(dp_line_4$data$shap),
+      yend = max(dp_line_4$data$shap) * 0.9
+    ),
     linetype = "dashed",
     alpha = 0.4
   ) +
@@ -175,22 +219,31 @@ mp_4 <- dp_line_4 +
 # Assemble Final Figure --------------------------------------------------------
 # ============================================================================ #
 annotate_figure(
-  ggarrange(mp_1 + rremove("y.title"), mp_2 + rremove("y.title"), 
-            mp_3 + rremove("y.title"), mp_4 + rremove("y.title"), 
-            labels = "AUTO",
-            ncol = 2, nrow = 2), 
+  ggarrange(
+    mp_1 + rremove("y.title"),
+    mp_2 + rremove("y.title"),
+    mp_3 + rremove("y.title"),
+    mp_4 + rremove("y.title"),
+    labels = "AUTO",
+    ncol = 2,
+    nrow = 2
+  ),
   left = textGrob("SHAP value", rot = 90, vjust = 1, gp = gpar(cex = 1.8))
 )
 
-ggsave(filename = file.path("graphs", paste0("fig_3.png")), 
-       plot = ggplot2::last_plot(), 
-       width = 50, height = 30, dpi = 400, units = "cm", bg = "white")
+ggsave(
+  filename = file.path("graphs", paste0("fig_3.png")),
+  plot = ggplot2::last_plot(),
+  width = 50,
+  height = 30,
+  dpi = 400,
+  units = "cm",
+  bg = "white"
+)
 
 # ============================================================================ #
 # Save Files -----------------------------------------------------------------
 # ============================================================================ #
-save(log_imp_vars, lasso_imp_vars, shap_xgb,
-     file = "raw_data/plots_shap.RData")
+save(log_imp_vars, lasso_imp_vars, shap_xgb, file = "raw_data/plots_shap.RData")
 
-save(shap_xgb, 
-     file = "raw_data/shap.RData")
+save(shap_xgb, file = "raw_data/shap.RData")
