@@ -1,6 +1,11 @@
 # Longevity Predictors Study
 
-This repository contains the complete R code for our study on predicting longevity using mid-life predictors. We analyze a historical cohort of 10,058 men recruited in 1963, who were followed up for 5 years to assess ischemic heart disease incidence (Medalie et al. 1973). Our goal is to compare traditional epidemiological methods (e.g., logistic regression) with modern machine learning techniques (LASSO regression and XGBoost) for predicting extreme longevity (near-centenarianism). We also apply explainable AI tools (SHAP) to enhance model interpretability.
+This repository contains the complete R code for the manuscript: 
+**Machine learning in epidemiology: an introduction, comparison with traditional methods, and a case study of predicting extreme longevity**  
+*Dor Atias, Saar Ashri, Uri Goldbourt, Yael Benyamini, Ran Gilad-Bachrach, Tal Hasin, Yariv Gerber, Uri Obolski*  
+*Annals of Epidemiology* (in press, 2025) – [doi:10.1016/j.annepidem.2025.07.024](https://doi.org/10.1016/j.annepidem.2025.07.024)
+
+We analyze a historical cohort of 10,058 men recruited in 1963, who were followed up for 5 years to assess ischemic heart disease incidence (Medalie et al. 1973). Our goal is to compare traditional epidemiological methods (e.g., logistic regression) with modern machine learning techniques (LASSO regression and XGBoost) for predicting extreme longevity (near-centenarianism). We also apply explainable AI tools (SHAP) to enhance model interpretability.
 
 ------------------------------------------------------------------------
 
@@ -29,10 +34,21 @@ This repository contains the complete R code for our study on predicting longevi
 
 ------------------------------------------------------------------------
 
-For questions, feedback, or collaboration inquiries, please contact the corresponding author:
+For questions, feedback, or collaboration inquiries, please contact 
+
+Lead analyst:
+
+Dr. Dor Atias
+
+Tel Aviv University, Grays School of Public Health
+
+Email: [doratias\@mail.tau.ac.il](mailto:doratias@mail.tau.ac.il){.email}
+
+
+Corresponding author:
 
 Prof. Uri Obolski, Ph.D.
 
-Tel Aviv University, School of Public Health
+Tel Aviv University, Grays School of Public Health
 
 Email: [uriobols\@tauex.tau.ac.il](mailto:uriobols@tauex.tau.ac.il){.email}
