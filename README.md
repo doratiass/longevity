@@ -34,7 +34,7 @@ We analyze a historical cohort of 10,058 men recruited in 1963, who were followe
 
 For questions, feedback, or collaboration inquiries, please contact
 
-Lead analyst:
+### Lead analyst:
 
 Dr. Dor Atias
 
@@ -42,7 +42,7 @@ Tel Aviv University, Grays School of Public Health
 
 Email: [doratias\@mail.tau.ac.il](mailto:doratias@mail.tau.ac.il)
 
-Corresponding author:
+### Corresponding author:
 
 Prof. Uri Obolski, Ph.D.
 
