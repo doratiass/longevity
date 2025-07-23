@@ -29,7 +29,6 @@ We analyze a historical cohort of 10,058 men recruited in 1963, who were followe
 -   **Results and Outputs:**
 
     -   The full output of our study is available [here](https://doratiass.github.io/longevity/).
-    -   The manuscript, titled “Machine learning in epidemiology: an introduction, comparison with traditional methods, and a case study of predicting extreme longevity”, is currently under review.
     -   An interactive SHAP values exploration tool can be accessed [here](https://dorati-longevity-shap.hf.space).
 
 ------------------------------------------------------------------------
@@ -42,7 +41,7 @@ Dr. Dor Atias
 
 Tel Aviv University, Grays School of Public Health
 
-Email: [doratias\@mail.tau.ac.il](mailto:doratias@mail.tau.ac.il){.email}
+Email: [doratias\@mail.tau.ac.il](mailto:doratias@mail.tau.ac.il)
 
 
 Corresponding author:
@@ -51,4 +50,4 @@ Prof. Uri Obolski, Ph.D.
 
 Tel Aviv University, Grays School of Public Health
 
-Email: [uriobols\@tauex.tau.ac.il](mailto:uriobols@tauex.tau.ac.il){.email}
+Email: [uriobols\@tauex.tau.ac.il](mailto:uriobols@tauex.tau.ac.il)
